@@ -1,0 +1,14 @@
+input {
+  padding: 8px;
+  margin-right: 10px;
+}
+
+button {
+  margin-left: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+li {
+  margin: 10px 0;
+}

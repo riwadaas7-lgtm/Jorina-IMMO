@@ -1,0 +1,23 @@
+<h2>Contracts</h2>
+
+<select [(ngModel)]="tenantId">
+  <option [ngValue]="null">Select locataire</option>
+  <option *ngFor="let u of users" [ngValue]="u.id">
+    {{ u.name }}
+  </option>
+</select>
+
+<select [(ngModel)]="apartmentId">
+  <option [ngValue]="null">Select apartment</option>
+  <option *ngFor="let a of apartments" [ngValue]="a.id">
+    {{ a.name }}
+  </option>
+</select>
+
+<button (click)="add()">Add</button>
+
+<ul>
+  <li *ngFor="let c of contracts">
+    👤 {{ c.tenant_id }} → 🏠 {{ c.apartment_id }}
+  </li>
+</ul>

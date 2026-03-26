@@ -1,0 +1,21 @@
+<h2>Factures</h2>
+
+<input [(ngModel)]="type" placeholder="Type">
+
+<input [(ngModel)]="montant" type="number" placeholder="Montant">
+
+<select [(ngModel)]="contractId">
+  <option [ngValue]="null">Select contract</option>
+  <option *ngFor="let c of contracts" [ngValue]="c.id">
+    Contract {{ c.id }}
+  </option>
+</select>
+
+<button (click)="add()">Add</button>
+
+<ul>
+  <li *ngFor="let f of factures">
+    {{ f.type }} - {{ f.montant }} DT ({{ f.status }})
+    <button (click)="delete(f.id)">✕</button>
+  </li>
+</ul>

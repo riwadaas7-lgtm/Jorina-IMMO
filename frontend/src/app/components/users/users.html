@@ -1,0 +1,18 @@
+<h2>Users</h2>
+
+<input [(ngModel)]="name" placeholder="Name">
+
+<select [(ngModel)]="role">
+  <option value="">Select role</option>
+  <option value="proprietaire">Propriétaire</option>
+  <option value="locataire">Locataire</option>
+</select>
+
+<button (click)="add()">Add</button>
+
+<ul>
+  <li *ngFor="let u of users">
+    {{ u.name }} — {{ u.role }}
+    <button (click)="delete(u.id)">✕</button>
+  </li>
+</ul>

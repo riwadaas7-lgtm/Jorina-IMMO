@@ -1,0 +1,25 @@
+<h2>Departments</h2>
+
+<input [(ngModel)]="name" placeholder="New department">
+<button (click)="add()">Add</button>
+
+<ul>
+  <li *ngFor="let d of departments">
+
+  <!-- NORMAL MODE -->
+  <span *ngIf="editingId !== d.id">
+    {{ d.name }}
+  </span>
+
+  <!-- EDIT MODE -->
+  <input *ngIf="editingId === d.id" [(ngModel)]="editingName">
+
+  <!-- BUTTONS -->
+  <button *ngIf="editingId !== d.id" (click)="startEdit(d)">✏️</button>
+
+  <button *ngIf="editingId === d.id" (click)="saveEdit()">💾</button>
+
+  <button (click)="delete(d.id)">✕</button>
+
+</li>
+</ul>

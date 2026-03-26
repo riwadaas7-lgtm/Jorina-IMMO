@@ -1,0 +1,27 @@
+<h2>Apartments</h2>
+
+<input [(ngModel)]="name" placeholder="Apartment name">
+
+<select [(ngModel)]="departmentId">
+  <option [ngValue]="null">Select department</option>
+  <option *ngFor="let d of departments" [ngValue]="d.id">
+    {{ d.name }}
+  </option>
+</select>
+
+<button (click)="add()">Add</button>
+
+<ul>
+  <li *ngFor="let a of apartments">
+  <span *ngIf="editingId !== a.id">{{ a.name }} — 
+  {{ getDepartmentName(a.department_id) }}</span>
+
+  <input *ngIf="editingId === a.id" [(ngModel)]="editingName">
+
+  <button *ngIf="editingId !== a.id" (click)="startEdit(a)">✏️</button>
+
+  <button *ngIf="editingId === a.id" (click)="saveEdit()">💾</button>
+
+  <button (click)="delete(a.id)">✕</button>
+</li>
+</ul>
