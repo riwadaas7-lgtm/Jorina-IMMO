@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
-import { ApartmentsComponent } from '../apartments/apartments';
-import { DepartmentsComponent } from '../departments/departments';
-import { RouterModule } from '@angular/router'; // ✅ ADD THIS
+import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [DepartmentsComponent, ApartmentsComponent,RouterModule],
-  templateUrl: './layout.html', // ✅ USE HTML FILE
+  imports: [CommonModule, RouterModule],
+  templateUrl: './layout.html',
+  styleUrl: './layout.css'
 })
 export class LayoutComponent {}

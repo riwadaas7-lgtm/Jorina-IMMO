@@ -1,25 +1,75 @@
-<h2>Departments</h2>
+<h2 class="mb-4">🏢 Departments</h2>
 
-<input [(ngModel)]="name" placeholder="New department">
-<button (click)="add()">Add</button>
+<!-- 🔵 FORM -->
+<div class="card p-3 mb-4">
 
-<ul>
-  <li *ngFor="let d of departments">
+  <div class="row g-2">
 
-  <!-- NORMAL MODE -->
-  <span *ngIf="editingId !== d.id">
-    {{ d.name }}
-  </span>
+    <div class="col-md-3">
+      <input class="form-control"
+             [(ngModel)]="nom"
+             placeholder="Nom">
+    </div>
 
-  <!-- EDIT MODE -->
-  <input *ngIf="editingId === d.id" [(ngModel)]="editingName">
+    <div class="col-md-3">
+      <input class="form-control"
+             [(ngModel)]="ville"
+             placeholder="Ville">
+    </div>
 
-  <!-- BUTTONS -->
-  <button *ngIf="editingId !== d.id" (click)="startEdit(d)">✏️</button>
+    <div class="col-md-3">
+      <input class="form-control"
+             [(ngModel)]="code_postal"
+             placeholder="Code postal">
+    </div>
 
-  <button *ngIf="editingId === d.id" (click)="saveEdit()">💾</button>
+    <div class="col-md-3">
+      <input class="form-control"
+             [(ngModel)]="address"
+             placeholder="Address">
+    </div>
 
-  <button (click)="delete(d.id)">✕</button>
+    <div class="col-md-12 mt-2">
+      <button class="btn btn-primary w-100" (click)="add()">
+        ➕ Add Department
+      </button>
+    </div>
 
-</li>
-</ul>
+  </div>
+
+</div>
+
+---
+
+<!-- 🔥 LIST -->
+<div class="row">
+
+  <div class="col-md-4 mb-3" *ngFor="let d of departments">
+
+    <div class="card p-3 shadow-sm">
+
+      <h5>{{ d.nom }}</h5>
+
+      <p class="mb-1">📍 {{ d.ville }}</p>
+      <p class="mb-1">📮 {{ d.code_postal }}</p>
+      <p class="mb-2">🏠 {{ d.address }}</p>
+
+      <div class="d-flex justify-content-between">
+
+        <button class="btn btn-sm btn-warning"
+                (click)="startEdit(d)">
+          ✏️
+        </button>
+
+        <button class="btn btn-sm btn-danger"
+                (click)="delete(d.id)">
+          🗑️
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

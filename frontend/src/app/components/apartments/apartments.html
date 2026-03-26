@@ -1,27 +1,79 @@
-<h2>Apartments</h2>
+<h2 class="mb-4">🏠 Apartments</h2>
 
-<input [(ngModel)]="name" placeholder="Apartment name">
+<!-- 🔵 FORM -->
+<div class="card p-3 mb-4">
 
-<select [(ngModel)]="departmentId">
-  <option [ngValue]="null">Select department</option>
-  <option *ngFor="let d of departments" [ngValue]="d.id">
-    {{ d.name }}
-  </option>
-</select>
+  <div class="row g-2">
 
-<button (click)="add()">Add</button>
+    <div class="col-md-4">
+      <input class="form-control"
+             [(ngModel)]="name"
+             placeholder="Apartment name">
+    </div>
 
-<ul>
-  <li *ngFor="let a of apartments">
-  <span *ngIf="editingId !== a.id">{{ a.name }} — 
-  {{ getDepartmentName(a.department_id) }}</span>
+    <div class="col-md-4">
+      <select class="form-select" [(ngModel)]="departmentId">
+        <option [ngValue]="null">Select department</option>
+        <option *ngFor="let d of departments" [ngValue]="d.id">
+          {{ d.nom }}
+        </option>
+      </select>
+    </div>
 
-  <input *ngIf="editingId === a.id" [(ngModel)]="editingName">
+    <div class="col-md-4">
+      <button class="btn btn-primary w-100" (click)="add()">
+        ➕ Add Apartment
+      </button>
+    </div>
 
-  <button *ngIf="editingId !== a.id" (click)="startEdit(a)">✏️</button>
+  </div>
 
-  <button *ngIf="editingId === a.id" (click)="saveEdit()">💾</button>
+</div>
 
-  <button (click)="delete(a.id)">✕</button>
-</li>
-</ul>
+---
+
+<!-- 🔥 LIST -->
+<div class="row">
+
+  <div class="col-md-4 mb-3" *ngFor="let a of apartments">
+
+    <div class="card p-3 shadow-sm">
+
+      <h5>{{ a.nom }}</h5>
+
+      <p class="mb-1">
+        💰 {{ a.price }} DT
+      </p>
+
+      <p class="mb-1">
+        🏢 {{ getDepartmentName(a.department_id) }}
+      </p>
+
+      <p>
+        📌 
+        <span [class.text-success]="a.status === 'libre'"
+              [class.text-danger]="a.status !== 'libre'">
+          {{ a.status }}
+        </span>
+      </p>
+
+      <!-- ACTIONS -->
+      <div class="d-flex justify-content-between">
+
+        <button class="btn btn-sm btn-warning"
+                (click)="startEdit(a)">
+          ✏️
+        </button>
+
+        <button class="btn btn-sm btn-danger"
+                (click)="delete(a.id)">
+          🗑️
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

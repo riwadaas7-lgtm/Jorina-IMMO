@@ -1,20 +1,58 @@
-<div class="container">
-  <h1>Jorina Dashboard</h1>
-<nav>
-  <a routerLink="/departments">Departments</a><br>
-  <a routerLink="/apartments">Apartments</a><br>
-  <a routerLink="/contracts">Contracts</a> <br>
-  <a routerLink="/users">Users</a>
-</nav>
+<div class="container-fluid">
+  <div class="row">
 
-<router-outlet></router-outlet>
-  <div class="grid">
-    <div class="card">
-      <app-departments></app-departments>
-    </div>
+    <!-- 🔵 SIDEBAR -->
+    <nav class="col-md-2 d-none d-md-block bg-primary sidebar p-3 text-white">
 
-    <div class="card">
-      <app-apartments></app-apartments>
-    </div>
+      <h4 class="mb-4">🏢 App</h4>
+
+      <ul class="nav flex-column">
+
+        <li class="nav-item">
+          <a class="nav-link text-white" routerLink="/departments">
+            🏢 Departments
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link text-white" routerLink="/apartments">
+            🏠 Apartments
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link text-white" routerLink="/users">
+            👤 Users
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link text-white" routerLink="/contracts">
+            📄 Contracts
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link text-white" routerLink="/factures">
+            🧾 Factures
+          </a>
+        </li>
+
+      </ul>
+    </nav>
+
+    <!-- 🔥 MAIN CONTENT -->
+    <main class="col-md-10 ms-sm-auto px-4 py-4 bg-light" style="min-height: 100vh;">
+
+      <!-- TOP BAR -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>Dashboard</h3>
+      </div>
+
+      <!-- ROUTES LOAD HERE -->
+      <router-outlet></router-outlet>
+
+    </main>
+
   </div>
 </div>
