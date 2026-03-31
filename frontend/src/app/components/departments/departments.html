@@ -1,75 +1,119 @@
-<h2 class="mb-4">🏢 Departments</h2>
+<div class="page">
 
-<!-- 🔵 FORM -->
-<div class="card p-3 mb-4">
+  <h2 class="page-title">Mes Départements</h2>
 
-  <div class="row g-2">
+  <!-- CARDS GRID -->
+  <div class="dept-grid">
 
-    <div class="col-md-3">
-      <input class="form-control"
-             [(ngModel)]="nom"
-             placeholder="Nom">
-    </div>
+    <div class="dept-card" *ngFor="let d of departments">
 
-    <div class="col-md-3">
-      <input class="form-control"
-             [(ngModel)]="ville"
-             placeholder="Ville">
-    </div>
+      <!-- PHOTO -->
+      <div class="dept-photo">
+        <img [src]="d.photo || 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=400'"
+             [alt]="d.nom" />
+        <button class="menu-btn" (click)="toggleMenu(d)">⋮</button>
 
-    <div class="col-md-3">
-      <input class="form-control"
-             [(ngModel)]="code_postal"
-             placeholder="Code postal">
-    </div>
+        <!-- DROPDOWN MENU -->
+        <div class="dropdown" *ngIf="d.showMenu">
+          <button (click)="startEdit(d)">✏️ Modifier</button>
+          <button class="danger" (click)="delete(d.id)">🗑️ Supprimer</button>
+        </div>
+      </div>
 
-    <div class="col-md-3">
-      <input class="form-control"
-             [(ngModel)]="address"
-             placeholder="Address">
-    </div>
+      <!-- INFO -->
+      <div class="dept-info">
 
-    <div class="col-md-12 mt-2">
-      <button class="btn btn-primary w-100" (click)="add()">
-        ➕ Add Department
-      </button>
-    </div>
+        <div class="dept-header">
+          <div>
+            <h3>{{ d.nom }}</h3>
+            <p class="ville">{{ d.ville }}</p>
+          </div>
+          <span class="price-badge">{{ d.total_price || 0 | number }}€</span>
+        </div>
 
-  </div>
+        <div class="dept-stats">
+          <span class="stat">{{ d.apartments?.length || 0 }} appartements</span>
+          <span class="status-badge actif">Actif</span>
+        </div>
 
-</div>
-
----
-
-<!-- 🔥 LIST -->
-<div class="row">
-
-  <div class="col-md-4 mb-3" *ngFor="let d of departments">
-
-    <div class="card p-3 shadow-sm">
-
-      <h5>{{ d.nom }}</h5>
-
-      <p class="mb-1">📍 {{ d.ville }}</p>
-      <p class="mb-1">📮 {{ d.code_postal }}</p>
-      <p class="mb-2">🏠 {{ d.address }}</p>
-
-      <div class="d-flex justify-content-between">
-
-        <button class="btn btn-sm btn-warning"
-                (click)="startEdit(d)">
-          ✏️
-        </button>
-
-        <button class="btn btn-sm btn-danger"
-                (click)="delete(d.id)">
-          🗑️
-        </button>
+        <div class="dept-stats">
+          <span class="stat">{{ d.tenants || 0 }} locataires</span>
+        </div>
 
       </div>
 
     </div>
 
   </div>
+
+  <!-- EMPTY STATE -->
+  <div class="empty" *ngIf="departments.length === 0">
+    <p>Aucun département pour le moment.</p>
+  </div>
+
+  <!-- EDIT MODAL -->
+  <div class="modal-overlay" *ngIf="editingId !== null" (click)="cancelEdit()">
+    <div class="modal" (click)="$event.stopPropagation()">
+
+      <h3>Modifier le département</h3>
+
+      <div class="field">
+        <label>Nom</label>
+        <input [(ngModel)]="editingNom" />
+      </div>
+      <div class="field">
+        <label>Ville</label>
+        <input [(ngModel)]="editingVille" />
+      </div>
+      <div class="field">
+        <label>Code postal</label>
+        <input [(ngModel)]="editingCodePostal" />
+      </div>
+      <div class="field">
+        <label>Adresse</label>
+        <input [(ngModel)]="editingAddress" />
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="cancelEdit()">Annuler</button>
+        <button class="btn-save" (click)="saveEdit()">Enregistrer</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ADD MODAL -->
+  <div class="modal-overlay" *ngIf="showAddModal" (click)="showAddModal = false">
+    <div class="modal" (click)="$event.stopPropagation()">
+
+      <h3>Nouveau département</h3>
+
+      <div class="field">
+        <label>Nom</label>
+        <input [(ngModel)]="nom" placeholder="Résidence Les Oliviers" />
+      </div>
+      <div class="field">
+        <label>Ville</label>
+        <input [(ngModel)]="ville" placeholder="Paris" />
+      </div>
+      <div class="field">
+        <label>Code postal</label>
+        <input [(ngModel)]="code_postal" placeholder="75001" />
+      </div>
+      <div class="field">
+        <label>Adresse</label>
+        <input [(ngModel)]="address" placeholder="12 rue de la Paix" />
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="showAddModal = false">Annuler</button>
+        <button class="btn-save" (click)="add()">Ajouter</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FAB -->
+  <button class="fab" *ngIf="isOwner" (click)="showAddModal = true">+</button>
 
 </div>

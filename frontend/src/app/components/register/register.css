@@ -1,0 +1,284 @@
+/* register.css */
+
+.register-page {
+  min-height: 100vh;
+  display: flex;
+}
+
+/* ── LEFT PANEL ───────────────────────────── */
+.register-left {
+  width: 420px;
+  min-width: 420px;
+  background: var(--navy);
+  padding: 48px 44px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.left-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--white);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  margin-bottom: 64px;
+}
+
+.left-content {
+  flex: 1;
+}
+
+.left-content h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 38px;
+  line-height: 1.15;
+  color: var(--white);
+  margin-bottom: 20px;
+}
+
+.left-content p {
+  font-size: 15px;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.7;
+}
+
+.left-features {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 48px;
+}
+
+.left-feature {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: rgba(255,255,255,0.75);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.lf-icon {
+  width: 22px;
+  height: 22px;
+  background: var(--gold);
+  color: var(--white);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ── RIGHT PANEL ──────────────────────────── */
+.register-right {
+  flex: 1;
+  background: var(--bg);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 24px;
+  overflow-y: auto;
+}
+
+.register-form-wrap {
+  width: 100%;
+  max-width: 540px;
+}
+
+.form-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--navy);
+  margin-bottom: 6px;
+}
+
+.form-subtitle {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+
+.form-card {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  padding: 32px 28px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ── FIELDS ───────────────────────────────── */
+.fields-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.required { color: var(--danger); }
+
+.input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--muted-light);
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.input-wrap input {
+  width: 100%;
+  padding: 12px 14px 12px 40px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 14px;
+  color: var(--text);
+  background: var(--bg);
+  outline: none;
+  transition: border 0.2s, background 0.2s;
+}
+
+.input-wrap input:focus {
+  border-color: var(--navy);
+  background: var(--white);
+}
+
+.input-wrap input::placeholder {
+  color: var(--muted-light);
+}
+
+/* ── ROLE TOGGLE ──────────────────────────── */
+.role-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.role-card {
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--bg);
+}
+
+.role-card:hover {
+  border-color: var(--navy);
+  color: var(--navy);
+}
+
+.role-card.active {
+  border-color: var(--navy);
+  background: var(--white);
+  color: var(--navy);
+  font-weight: 700;
+  box-shadow: 0 0 0 3px rgba(26,39,68,0.07);
+}
+
+/* ── ERROR ────────────────────────────────── */
+.error-msg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--danger-bg);
+  color: var(--danger);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid #fecaca;
+}
+
+/* ── SUBMIT ───────────────────────────────── */
+.btn-submit {
+  background: var(--gold);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: 15px;
+  font-size: 15px;
+  font-weight: 700;
+  width: 100%;
+  transition: background 0.2s, transform 0.15s;
+  box-shadow: 0 4px 14px rgba(201,168,76,0.3);
+  letter-spacing: 0.2px;
+}
+
+.btn-submit:hover:not(:disabled) {
+  background: var(--gold-hover);
+  transform: translateY(-1px);
+}
+
+.btn-submit:disabled { opacity: 0.7; }
+
+.loading-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── LOGIN LINK ───────────────────────────── */
+.login-link {
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.login-link a {
+  color: var(--navy);
+  font-weight: 700;
+}
+
+.login-link a:hover { text-decoration: underline; }
+
+/* ── RESPONSIVE ───────────────────────────── */
+@media (max-width: 768px) {
+  .register-page { flex-direction: column; }
+  .register-left { width: 100%; min-width: unset; padding: 32px 24px; }
+  .left-content h2 { font-size: 26px; }
+  .fields-row { grid-template-columns: 1fr; }
+}

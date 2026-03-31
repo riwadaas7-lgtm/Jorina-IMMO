@@ -1,78 +1,95 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-apartments',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './apartments.html',
-  
+  styleUrl: './apartments.css'
 })
-export class ApartmentsComponent {
+export class ApartmentsComponent implements OnInit {
 
-  apartments: any[] = [];
+  user         = JSON.parse(localStorage.getItem('user') || '{}');
+  apartments:  any[] = [];
   departments: any[] = [];
 
-  name = '';
-  departmentId: number | null = null;
+  showAddModal = false;
+  editingId: number | null = null;
+  activeTab    = 'tous';
+  searchTerm   = '';
 
-  constructor(private api: ApiService) {
-    this.load();
+  form = {
+    nom: '', etage: 0, price: 0,
+    description: '', department_id: '', status: 'libre'
+  };
+
+  constructor(private api: ApiService) {}
+
+  ngOnInit() {
+    this.loadApartments();
+    this.api.getDepartments().subscribe(res => this.departments = res);
   }
 
-  load() {
-    this.api.getApartments().subscribe((res: any[]) => {
-      this.apartments = res;
-    });
+  loadApartments() {
+    this.api.getApartments(this.user.id)
+      .subscribe(res => this.apartments = res);
+  }
 
-    this.api.getDepartments().subscribe((res: any[]) => {
-      this.departments = res;
+  countByStatus(s: string) {
+    return this.apartments.filter(a => a.status === s).length;
+  }
+
+  statusLabel(s: string) {
+    return { occupe: 'Occupé', libre: 'Disponible', maintenance: 'Maintenance' }[s] || s;
+  }
+
+  filtered() {
+    return this.apartments.filter(a => {
+      const matchTab    = this.activeTab === 'tous' || a.status === this.activeTab;
+      const matchSearch = !this.searchTerm ||
+        a.nom?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        a.description?.toLowerCase().includes(this.searchTerm.toLowerCase());
+      return matchTab && matchSearch;
     });
   }
 
   add() {
-    console.log("ADD APARTMENT");
-
-    if (!this.name || !this.departmentId) return;
-
-    this.api.addApartment({
-      name: this.name,
-      department_id: this.departmentId
-    }).subscribe(() => {
-      this.name = '';
-      this.departmentId = null;
-      this.load();
+    if (!this.form.nom || !this.form.department_id) return;
+    this.api.addApartment(this.form).subscribe(() => {
+      this.showAddModal = false;
+      this.resetForm();
+      this.loadApartments();
     });
   }
+
   delete(id: number) {
-  this.api.deleteApartment(id).subscribe(() => {
-    this.load();
-  });
-}
-getDepartmentName(id: number) {
-  const dep = this.departments.find(d => d.id === id);
-  return dep ? dep.name : 'Unknown';
-}
-editingId: number | null = null;
-editingName = '';
-editingDepartmentId: number | null = null;
-startEdit(a: any) {
-  this.editingId = a.id;
-  this.editingName = a.name;
-  this.editingDepartmentId = a.department_id;
-}
+    if (!confirm('Supprimer cet appartement ?')) return;
+    this.api.deleteApartment(id).subscribe(() => this.loadApartments());
+  }
 
-saveEdit() {
-  if (this.editingId === null) return;
+  startEdit(a: any) {
+    this.editingId = a.id;
+    this.form = { nom: a.nom, etage: a.etage, price: a.price,
+                  description: a.description, department_id: a.department_id,
+                  status: a.status };
+  }
 
-  this.api.updateApartment(this.editingId, {
-    name: this.editingName,
-    department_id: this.editingDepartmentId
-  }).subscribe(() => {
-    this.editingId = null;
-    this.load();
-  });
-}
+  cancelEdit() { this.editingId = null; this.resetForm(); }
+
+  saveEdit() {
+    if (this.editingId === null) return;
+    this.api.updateApartment(this.editingId, this.form).subscribe(() => {
+      this.editingId = null;
+      this.resetForm();
+      this.loadApartments();
+    });
+  }
+
+  resetForm() {
+    this.form = { nom: '', etage: 0, price: 0,
+                  description: '', department_id: '', status: 'libre' };
+  }
 }

@@ -1,0 +1,165 @@
+.login-page {
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+/* LOGO */
+.login-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.logo-icon {
+  font-size: 32px;
+}
+
+.logo-text {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--navy);
+  letter-spacing: 0.5px;
+}
+
+/* CARD */
+.login-card {
+  background: var(--white);
+  border-radius: 24px;
+  padding: 40px 36px;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.login-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--navy);
+  text-align: center;
+}
+
+/* FIELDS */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field label {
+  font-weight: 600;
+  color: var(--navy);
+  font-size: 14px;
+}
+
+.field input {
+  padding: 14px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  font-size: 15px;
+  outline: none;
+  transition: border 0.2s;
+  background: #fafafa;
+}
+
+.field input:focus {
+  border-color: var(--navy);
+  background: var(--white);
+}
+
+/* ROLE TOGGLE */
+.role-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.role-card {
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 13px;
+  text-align: center;
+  background: #fafafa;
+}
+
+.role-card:hover {
+  border-color: var(--navy);
+  color: var(--navy);
+}
+
+.role-card.active {
+  border-color: var(--navy);
+  color: var(--navy);
+  background: var(--white);
+  font-weight: 600;
+}
+
+.role-icon {
+  font-size: 26px;
+}
+
+/* ERROR */
+.error-msg {
+  background: #fef2f2;
+  color: var(--danger);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid #fecaca;
+}
+
+/* BUTTON */
+.btn-login {
+  background: var(--gold);
+  color: var(--white);
+  border: none;
+  border-radius: 14px;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 700;
+  width: 100%;
+  transition: background 0.2s;
+  letter-spacing: 0.3px;
+}
+
+.btn-login:hover:not(:disabled) {
+  background: var(--gold-hover);
+}
+
+.btn-login:disabled {
+  opacity: 0.7;
+}
+
+/* REGISTER LINK */
+.register-link {
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.register-link a {
+  color: var(--navy);
+  font-weight: 600;
+}
+
+.register-link a:hover {
+  text-decoration: underline;
+}

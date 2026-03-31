@@ -1,79 +1,161 @@
-<h2 class="mb-4">🏠 Apartments</h2>
+<div class="page">
 
-<!-- 🔵 FORM -->
-<div class="card p-3 mb-4">
-
-  <div class="row g-2">
-
-    <div class="col-md-4">
-      <input class="form-control"
-             [(ngModel)]="name"
-             placeholder="Apartment name">
-    </div>
-
-    <div class="col-md-4">
-      <select class="form-select" [(ngModel)]="departmentId">
-        <option [ngValue]="null">Select department</option>
-        <option *ngFor="let d of departments" [ngValue]="d.id">
-          {{ d.nom }}
-        </option>
-      </select>
-    </div>
-
-    <div class="col-md-4">
-      <button class="btn btn-primary w-100" (click)="add()">
-        ➕ Add Apartment
-      </button>
-    </div>
-
+  <!-- HEADER -->
+  <div class="page-header">
+    <h2 class="page-title">Gestion des Appartements</h2>
+    <button class="btn-add" (click)="showAddModal = true">+ Ajouter</button>
   </div>
 
-</div>
+  <!-- STAT CARDS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <span class="stat-label">Total</span>
+      <span class="stat-value">{{ apartments.length }}</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Occupés</span>
+      <span class="stat-value green">{{ countByStatus('occupe') }}</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Disponibles</span>
+      <span class="stat-value blue">{{ countByStatus('libre') }}</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Maintenance</span>
+      <span class="stat-value red">{{ countByStatus('maintenance') }}</span>
+    </div>
+  </div>
 
----
+  <!-- SEARCH -->
+  <div class="search-filter">
+    <div class="search-inner">
+      <span>🔍</span>
+      <input type="text"
+             placeholder="Rechercher par nom, département, ville ou locataire..."
+             [(ngModel)]="searchTerm" />
+    </div>
+    <button class="btn-filter">⚙ Filtrer</button>
+  </div>
 
-<!-- 🔥 LIST -->
-<div class="row">
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab" [class.active]="activeTab === 'tous'"
+            (click)="activeTab = 'tous'">Tous</button>
+    <button class="tab" [class.active]="activeTab === 'occupe'"
+            (click)="activeTab = 'occupe'">Occupés</button>
+    <button class="tab" [class.active]="activeTab === 'libre'"
+            (click)="activeTab = 'libre'">Disponibles</button>
+    <button class="tab" [class.active]="activeTab === 'maintenance'"
+            (click)="activeTab = 'maintenance'">Maintenance</button>
+  </div>
 
-  <div class="col-md-4 mb-3" *ngFor="let a of apartments">
+  <!-- APARTMENT CARDS -->
+  <div class="apt-grid">
+    <div class="apt-card" *ngFor="let a of filtered()">
 
-    <div class="card p-3 shadow-sm">
+      <div class="apt-icon">🏠</div>
 
-      <h5>{{ a.nom }}</h5>
-
-      <p class="mb-1">
-        💰 {{ a.price }} DT
-      </p>
-
-      <p class="mb-1">
-        🏢 {{ getDepartmentName(a.department_id) }}
-      </p>
-
-      <p>
-        📌 
-        <span [class.text-success]="a.status === 'libre'"
-              [class.text-danger]="a.status !== 'libre'">
-          {{ a.status }}
-        </span>
-      </p>
-
-      <!-- ACTIONS -->
-      <div class="d-flex justify-content-between">
-
-        <button class="btn btn-sm btn-warning"
-                (click)="startEdit(a)">
-          ✏️
-        </button>
-
-        <button class="btn btn-sm btn-danger"
-                (click)="delete(a.id)">
-          🗑️
-        </button>
-
+      <div class="apt-body">
+        <div class="apt-top">
+          <span class="apt-name">{{ a.nom }}</span>
+          <span class="status-badge" [ngClass]="a.status">
+            {{ statusLabel(a.status) }}
+          </span>
+        </div>
+        <p class="apt-sub">{{ a.etage ? a.etage + 'ème étage' : '' }}
+          {{ a.description }}</p>
+        <div class="apt-footer">
+          <span class="apt-price">{{ a.price | number }}€/mois</span>
+          <div class="apt-actions">
+            <button class="btn-icon edit" (click)="startEdit(a)" title="Modifier">✏️</button>
+            <button class="btn-icon del"  (click)="delete(a.id)" title="Supprimer">🗑️</button>
+          </div>
+        </div>
       </div>
 
     </div>
+  </div>
 
+  <!-- EMPTY -->
+  <div class="empty" *ngIf="filtered().length === 0">
+    Aucun appartement trouvé.
+  </div>
+
+  <!-- ADD MODAL -->
+  <div class="modal-overlay" *ngIf="showAddModal" (click)="showAddModal = false">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3>Nouvel Appartement</h3>
+
+      <div class="field">
+        <label>Nom / Numéro</label>
+        <input [(ngModel)]="form.nom" placeholder="A101" />
+      </div>
+      <div class="fields-row">
+        <div class="field">
+          <label>Étage</label>
+          <input type="number" [(ngModel)]="form.etage" placeholder="1" />
+        </div>
+        <div class="field">
+          <label>Prix (€/mois)</label>
+          <input type="number" [(ngModel)]="form.price" placeholder="1200" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Description</label>
+        <input [(ngModel)]="form.description" placeholder="65m² • 2 ch." />
+      </div>
+      <div class="field">
+        <label>Département</label>
+        <select [(ngModel)]="form.department_id">
+          <option value="">-- Choisir --</option>
+          <option *ngFor="let d of departments" [value]="d.id">{{ d.nom }}</option>
+        </select>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="showAddModal = false">Annuler</button>
+        <button class="btn-save"   (click)="add()">Ajouter</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT MODAL -->
+  <div class="modal-overlay" *ngIf="editingId !== null" (click)="cancelEdit()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3>Modifier l'Appartement</h3>
+
+      <div class="field">
+        <label>Nom / Numéro</label>
+        <input [(ngModel)]="form.nom" />
+      </div>
+      <div class="fields-row">
+        <div class="field">
+          <label>Étage</label>
+          <input type="number" [(ngModel)]="form.etage" />
+        </div>
+        <div class="field">
+          <label>Prix (€/mois)</label>
+          <input type="number" [(ngModel)]="form.price" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Description</label>
+        <input [(ngModel)]="form.description" />
+      </div>
+      <div class="field">
+        <label>Statut</label>
+        <select [(ngModel)]="form.status">
+          <option value="libre">Disponible</option>
+          <option value="occupe">Occupé</option>
+          <option value="maintenance">Maintenance</option>
+        </select>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="cancelEdit()">Annuler</button>
+        <button class="btn-save"   (click)="saveEdit()">Enregistrer</button>
+      </div>
+    </div>
   </div>
 
 </div>

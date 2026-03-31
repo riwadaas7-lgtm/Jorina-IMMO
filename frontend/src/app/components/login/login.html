@@ -1,0 +1,67 @@
+<div class="login-page">
+
+  <!-- LOGO -->
+  <div class="login-logo">
+    <span class="logo-icon">🏢</span>
+    <span class="logo-text">JORILINA IMMO</span>
+  </div>
+
+  <!-- CARD -->
+  <div class="login-card">
+
+    <h2 class="login-title">Connexion</h2>
+
+    <!-- EMAIL -->
+    <div class="field">
+      <label>Email</label>
+      <input type="email"
+             placeholder="votre@email.com"
+             [(ngModel)]="email" />
+    </div>
+
+    <!-- PASSWORD -->
+    <div class="field">
+      <label>Mot de passe</label>
+      <input type="password"
+             placeholder="••••••••"
+             [(ngModel)]="password" />
+    </div>
+
+    <!-- ROLE TOGGLE -->
+    <div class="role-toggle">
+
+      <div class="role-card"
+           [class.active]="role === 'proprietaire'"
+           (click)="role = 'proprietaire'">
+        <span class="role-icon">🏠</span>
+        <span>Je suis Propriétaire</span>
+      </div>
+
+      <div class="role-card"
+           [class.active]="role === 'locataire'"
+           (click)="role = 'locataire'">
+        <span class="role-icon">🔑</span>
+        <span>Je suis Locataire</span>
+      </div>
+
+    </div>
+
+    <!-- ERROR -->
+    <div class="error-msg" *ngIf="errorMsg">
+      {{ errorMsg }}
+    </div>
+
+    <!-- SUBMIT -->
+    <button class="btn-login" (click)="login()" [disabled]="loading">
+      {{ loading ? 'Connexion...' : 'Se connecter' }}
+    </button>
+
+    <!-- REGISTER LINK -->
+    <p class="register-link">
+      Pas encore de compte ?
+      <a routerLink="/register">S'inscrire</a>
+    </p>
+
+  </div>
+
+</div>

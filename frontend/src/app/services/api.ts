@@ -1,13 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class ApiService {
+
   private baseUrl = 'http://127.0.0.1:8000';
 
   constructor(private http: HttpClient) {}
+
+  // AUTH
+  login(data: any) {
+    return this.http.post(this.baseUrl + '/login', data);
+  }
 
   // DEPARTMENTS
   getDepartments() {
@@ -27,9 +31,9 @@ export class ApiService {
   }
 
   // APARTMENTS
-  getApartments() {
-    return this.http.get<any[]>(this.baseUrl + '/apartments');
-  }
+  getApartments(userId: number) {
+  return this.http.get<any[]>(`${this.baseUrl}/apartments/user/${userId}`);
+}
 
   addApartment(data: any) {
     return this.http.post(this.baseUrl + '/apartments', data);
@@ -43,14 +47,19 @@ export class ApiService {
     return this.http.put(this.baseUrl + '/apartments/' + id, data);
   }
 
-  // CONTRACTS ✅ FIXED
-  getContracts() {
-    return this.http.get<any[]>(this.baseUrl + '/contracts');
+  // JOIN
+  joinApartment(data: any) {
+    return this.http.post(this.baseUrl + '/join', data);
   }
 
+  // CONTRACTS
+  getContracts() {
+  return this.http.get<any[]>(this.baseUrl + '/contracts');
+}
+
   addContract(data: any) {
-    return this.http.post(this.baseUrl + '/contracts', data);
-  }
+  return this.http.post(this.baseUrl + '/contracts', data);
+}
 
   deleteContract(id: number) {
     return this.http.delete(this.baseUrl + '/contracts/' + id);
@@ -68,9 +77,11 @@ export class ApiService {
   deleteUser(id: number) {
     return this.http.delete(this.baseUrl + '/users/' + id);
   }
+
+  // FACTURES
   getFactures() {
-    return this.http.get<any[]>(this.baseUrl + '/factures');
-  }
+  return this.http.get<any[]>(this.baseUrl + '/factures');
+}
 
   addFacture(data: any) {
     return this.http.post(this.baseUrl + '/factures', data);
@@ -79,5 +90,7 @@ export class ApiService {
   deleteFacture(id: number) {
     return this.http.delete(this.baseUrl + '/factures/' + id);
   }
+  register(data: any) {
+  return this.http.post(this.baseUrl + '/register', data);
 }
-// Factures
+}

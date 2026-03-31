@@ -1,18 +1,268 @@
-input, select {
-  padding: 8px;
-  margin-right: 10px;
+.page { position: relative; }
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
 }
 
-button {
-  margin-left: 5px;
-  padding: 5px 10px;
-  cursor: pointer;
+.page-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--navy);
 }
 
-li {
-  margin: 10px 0;
+.btn-add {
+  background: var(--gold);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 22px;
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s;
+}
+.btn-add:hover { background: var(--gold-hover); }
+
+/* STATS */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
-strong {
-  margin-right: 10px;
+.stat-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
+
+.stat-label {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--navy);
+}
+.stat-value.green { color: #16a34a; }
+.stat-value.blue  { color: #2563eb; }
+.stat-value.red   { color: #dc2626; }
+
+/* SEARCH */
+.search-filter {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  box-shadow: var(--shadow);
+  align-items: center;
+}
+
+.search-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.search-inner input {
+  border: none;
+  outline: none;
+  font-size: 14px;
+  width: 100%;
+  color: var(--text);
+  background: transparent;
+}
+
+.btn-filter {
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--navy);
+  white-space: nowrap;
+}
+.btn-filter:hover { background: var(--bg); }
+
+/* TABS */
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 24px;
+}
+
+.tab {
+  background: none;
+  border: none;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+}
+.tab:hover { color: var(--navy); }
+.tab.active {
+  color: var(--navy);
+  font-weight: 700;
+  border-bottom-color: var(--gold);
+}
+
+/* APT GRID */
+.apt-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.apt-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  transition: transform 0.2s;
+}
+.apt-card:hover { transform: translateY(-2px); }
+
+.apt-icon {
+  width: 44px;
+  height: 44px;
+  background: var(--bg);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.apt-body { flex: 1; }
+
+.apt-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.apt-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.apt-sub {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.apt-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.apt-price {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.apt-actions { display: flex; gap: 6px; }
+
+.btn-icon {
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.btn-icon.edit:hover { border-color: var(--navy); background: #f0f4ff; }
+.btn-icon.del:hover  { border-color: var(--danger); background: #fff0f0; }
+
+/* STATUS BADGES */
+.status-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+.status-badge.occupe      { background: #dcfce7; color: #16a34a; }
+.status-badge.libre       { background: #dbeafe; color: #2563eb; }
+.status-badge.maintenance { background: #fef9c3; color: #b45309; }
+
+/* EMPTY */
+.empty {
+  text-align: center;
+  padding: 60px;
+  color: var(--muted);
+}
+
+/* MODAL */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100; padding: 20px;
+}
+.modal {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 32px;
+  width: 100%; max-width: 480px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.modal h3 { font-size: 20px; font-weight: 700; color: var(--navy); }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-weight: 600; font-size: 13px; color: var(--navy); }
+.field input, .field select {
+  padding: 12px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px; font-size: 14px; outline: none;
+  background: #fafafa;
+}
+.field input:focus, .field select:focus { border-color: var(--navy); }
+
+.fields-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.modal-actions { display: flex; gap: 12px; margin-top: 8px; }
+.btn-cancel {
+  flex: 1; padding: 12px; border-radius: 10px;
+  border: 1.5px solid var(--border); background: none;
+  color: var(--text); font-weight: 600; font-size: 14px;
+}
+.btn-save {
+  flex: 1; padding: 12px; border-radius: 10px;
+  border: none; background: var(--gold);
+  color: white; font-weight: 700; font-size: 14px;
+}
+.btn-save:hover { background: var(--gold-hover); }

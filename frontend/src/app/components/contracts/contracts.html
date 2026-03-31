@@ -1,23 +1,213 @@
-<h2>Contracts</h2>
+<div class="page">
 
-<select [(ngModel)]="tenantId">
-  <option [ngValue]="null">Select locataire</option>
-  <option *ngFor="let u of users" [ngValue]="u.id">
-    {{ u.name }}
-  </option>
-</select>
+  <!-- HEADER -->
+  <div class="page-header">
+    <h2 class="page-title">Gestion des Contrats</h2>
+    <button class="btn-add" (click)="showAddModal = true">
+      📄 Nouveau Contrat
+    </button>
+  </div>
 
-<select [(ngModel)]="apartmentId">
-  <option [ngValue]="null">Select apartment</option>
-  <option *ngFor="let a of apartments" [ngValue]="a.id">
-    {{ a.name }}
-  </option>
-</select>
+  <!-- STAT CARDS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <span class="stat-label">Total</span>
+      <span class="stat-value">{{ contracts.length }}</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Actifs</span>
+      <span class="stat-value green">{{ countByStatus('actif') }}</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">À renouveler</span>
+      <span class="stat-value orange">{{ countByStatus('renouveler') }}</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Expirés</span>
+      <span class="stat-value red">{{ countByStatus('expire') }}</span>
+    </div>
+  </div>
 
-<button (click)="add()">Add</button>
+  <!-- SEARCH -->
+  <div class="search-filter">
+    <div class="search-inner">
+      <span>🔍</span>
+      <input type="text"
+             placeholder="Rechercher par locataire ou appartement..."
+             [(ngModel)]="searchTerm" />
+    </div>
+    <button class="btn-filter">⚙ Filtrer</button>
+  </div>
 
-<ul>
-  <li *ngFor="let c of contracts">
-    👤 {{ c.tenant_id }} → 🏠 {{ c.apartment_id }}
-  </li>
-</ul>
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab" [class.active]="activeTab === 'tous'"
+            (click)="activeTab = 'tous'">Tous</button>
+    <button class="tab" [class.active]="activeTab === 'actif'"
+            (click)="activeTab = 'actif'">Actifs</button>
+    <button class="tab" [class.active]="activeTab === 'renouveler'"
+            (click)="activeTab = 'renouveler'">À renouveler</button>
+    <button class="tab" [class.active]="activeTab === 'expire'"
+            (click)="activeTab = 'expire'">Expirés</button>
+  </div>
+
+  <!-- CONTRACT LIST -->
+  <div class="contracts-list">
+
+    <div class="contract-card" *ngFor="let c of filtered()">
+
+      <!-- TOP -->
+      <div class="contract-top">
+        <div class="contract-left">
+          <div class="doc-icon">📄</div>
+          <div>
+            <h3 class="tenant-name">{{ c.tenant_name || 'Locataire #' + c.tenant_id }}</h3>
+            <p class="apt-name">{{ c.apartment_name || 'Appartement #' + c.apartment_id }}</p>
+          </div>
+        </div>
+        <span class="status-badge" [ngClass]="c.status">
+          {{ statusLabel(c.status) }}
+        </span>
+      </div>
+
+      <!-- INFO ROW -->
+      <div class="contract-info">
+        <div class="info-col">
+          <span class="info-label">Date début</span>
+          <span class="info-value">{{ c.date_debut }}</span>
+        </div>
+        <div class="info-col">
+          <span class="info-label">Date fin</span>
+          <span class="info-value">{{ c.date_fin }}</span>
+        </div>
+        <div class="info-col">
+          <span class="info-label">Loyer mensuel</span>
+          <span class="info-value gold">{{ c.montant_total | number }}€</span>
+        </div>
+        <div class="info-col">
+          <span class="info-label">Dépôt de garantie</span>
+          <span class="info-value">{{ c.caution | number }}€</span>
+        </div>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="contract-actions">
+        <button class="btn-voir" (click)="viewContract(c)">👁 Voir</button>
+        <button class="btn-dl">⬇ Télécharger</button>
+        <button class="btn-delete" (click)="delete(c.id)">🗑️</button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- EMPTY -->
+  <div class="empty" *ngIf="filtered().length === 0">
+    Aucun contrat trouvé.
+  </div>
+
+  <!-- ADD MODAL -->
+  <div class="modal-overlay" *ngIf="showAddModal" (click)="showAddModal = false">
+    <div class="modal" (click)="$event.stopPropagation()">
+
+      <h3>Nouveau Contrat</h3>
+
+      <div class="field">
+        <label>Locataire</label>
+        <select [(ngModel)]="form.tenant_id">
+          <option value="">-- Choisir un locataire --</option>
+          <option *ngFor="let u of tenants" [value]="u.id">
+            {{ u.prenom }} {{ u.nom }}
+          </option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Appartement</label>
+        <select [(ngModel)]="form.apartment_id">
+          <option value="">-- Choisir un appartement --</option>
+          <option *ngFor="let a of apartments" [value]="a.id">
+            {{ a.nom }}
+          </option>
+        </select>
+      </div>
+
+      <div class="fields-row">
+        <div class="field">
+          <label>Date début</label>
+          <input type="date" [(ngModel)]="form.date_debut" />
+        </div>
+        <div class="field">
+          <label>Date fin</label>
+          <input type="date" [(ngModel)]="form.date_fin" />
+        </div>
+      </div>
+
+      <div class="fields-row">
+        <div class="field">
+          <label>Loyer mensuel (€)</label>
+          <input type="number" [(ngModel)]="form.montant_total" placeholder="1200" />
+        </div>
+        <div class="field">
+          <label>Dépôt de garantie (€)</label>
+          <input type="number" [(ngModel)]="form.caution" placeholder="2400" />
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="showAddModal = false">Annuler</button>
+        <button class="btn-save" (click)="add()">Créer</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- VIEW MODAL -->
+  <div class="modal-overlay" *ngIf="viewingContract" (click)="viewingContract = null">
+    <div class="modal modal-wide" (click)="$event.stopPropagation()">
+
+      <div class="view-header">
+        <div>
+          <h3>Contrat de Location</h3>
+          <p class="view-sub">{{ viewingContract.tenant_name }}</p>
+        </div>
+        <span class="status-badge" [ngClass]="viewingContract.status">
+          {{ statusLabel(viewingContract.status) }}
+        </span>
+      </div>
+
+      <div class="view-grid">
+        <div class="view-field">
+          <span class="view-label">Locataire</span>
+          <span class="view-val">{{ viewingContract.tenant_name || '—' }}</span>
+        </div>
+        <div class="view-field">
+          <span class="view-label">Appartement</span>
+          <span class="view-val">{{ viewingContract.apartment_name || '—' }}</span>
+        </div>
+        <div class="view-field">
+          <span class="view-label">Date début</span>
+          <span class="view-val">{{ viewingContract.date_debut }}</span>
+        </div>
+        <div class="view-field">
+          <span class="view-label">Date fin</span>
+          <span class="view-val">{{ viewingContract.date_fin }}</span>
+        </div>
+        <div class="view-field">
+          <span class="view-label">Loyer mensuel</span>
+          <span class="view-val gold">{{ viewingContract.montant_total | number }}€</span>
+        </div>
+        <div class="view-field">
+          <span class="view-label">Dépôt de garantie</span>
+          <span class="view-val">{{ viewingContract.caution | number }}€</span>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="viewingContract = null">Fermer</button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

@@ -1,28 +1,50 @@
-/* You can add global styles to this file, and also import other style files */
-body {
-  font-family: Arial, sans-serif;
-  background: #f5f7fa;
+/* ═══════════════════════════════════════
+   JORILINA IMMO — Global Styles
+═══════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --navy:       #1a2744;
+  --navy-light: #243156;
+  --gold:       #c9a84c;
+  --gold-hover: #b8922f;
+  --bg:         #f0f2f5;
+  --white:      #ffffff;
+  --text:       #1a2744;
+  --muted:      #8492a6;
+  --border:     #e2e8f0;
+  --success:    #22c55e;
+  --warning:    #f59e0b;
+  --danger:     #ef4444;
+  --radius:     14px;
+  --shadow:     0 4px 20px rgba(0,0,0,0.08);
+  --shadow-lg:  0 8px 40px rgba(0,0,0,0.12);
+}
+
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.container {
-  padding: 20px;
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
 }
 
-h1 {
-  text-align: center;
-  margin-bottom: 30px;
+button {
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+input, select, textarea {
+  font-family: 'Inter', sans-serif;
 }
 
-.card {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+a {
+  text-decoration: none;
+  color: inherit;
 }

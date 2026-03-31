@@ -1,21 +1,86 @@
-<h2>Factures</h2>
+<div class="container mt-4">
 
-<input [(ngModel)]="type" placeholder="Type">
+  <h3 class="fw-bold mb-4">Factures</h3>
 
-<input [(ngModel)]="montant" type="number" placeholder="Montant">
+  <!-- 🔵 ADD -->
+  <div *ngIf="isOwner" class="card border-0 shadow-sm p-4 mb-4 rounded-4">
 
-<select [(ngModel)]="contractId">
-  <option [ngValue]="null">Select contract</option>
-  <option *ngFor="let c of contracts" [ngValue]="c.id">
-    Contract {{ c.id }}
-  </option>
-</select>
+    <h5 class="mb-3">New Facture</h5>
 
-<button (click)="add()">Add</button>
+    <div class="row g-3">
 
-<ul>
-  <li *ngFor="let f of factures">
-    {{ f.type }} - {{ f.montant }} DT ({{ f.status }})
-    <button (click)="delete(f.id)">✕</button>
-  </li>
-</ul>
+      <div class="col-md-3">
+        <input class="form-control"
+               [(ngModel)]="type"
+               placeholder="Type">
+      </div>
+
+      <div class="col-md-3">
+        <input class="form-control"
+               type="number"
+               [(ngModel)]="montant"
+               placeholder="Amount">
+      </div>
+
+      <div class="col-md-3">
+        <select class="form-select" [(ngModel)]="apartmentId">
+          <option [ngValue]="null">Apartment</option>
+          <option *ngFor="let a of apartments" [ngValue]="a.id">
+            {{ a.nom }}
+          </option>
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <button class="btn btn-primary w-100" (click)="add()">
+          Add
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- 🔥 TABLE -->
+  <div class="card border-0 shadow-sm rounded-4">
+
+    <div class="card-body">
+
+      <h5 class="mb-3">Factures List</h5>
+
+      <table class="table align-middle">
+
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Apartment</th>
+            <th *ngIf="isOwner">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let f of factures">
+            <td>{{ f.id }}</td>
+            <td>{{ f.type }}</td>
+            <td>{{ f.montant }} DT</td>
+            <td>{{ getApartmentName(f.apartment_id) }}</td>
+
+            <td *ngIf="isOwner">
+              <button class="btn btn-danger btn-sm"
+                      (click)="delete(f.id)">
+                Delete
+              </button>
+            </td>
+
+          </tr>
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>

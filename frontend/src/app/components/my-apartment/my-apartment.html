@@ -1,0 +1,70 @@
+<div class="page" *ngIf="!loading">
+
+  <h2 class="page-title">Mon Espace Locataire</h2>
+
+  <!-- NO APARTMENT -->
+  <div class="empty-state" *ngIf="!apartment">
+    <div class="empty-icon">🏠</div>
+    <h3>Vous n'avez pas encore d'appartement</h3>
+    <p>Contactez votre propriétaire pour obtenir un code d'accès.</p>
+  </div>
+
+  <!-- APARTMENT HERO -->
+  <div class="apt-hero" *ngIf="apartment">
+    <img [src]="apartment.photo || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200'"
+         [alt]="apartment.nom" class="hero-img" />
+
+    <div class="hero-overlay">
+      <div class="hero-content">
+        <h2>Mon Appartement</h2>
+        <p class="hero-address">{{ apartment.description || '12 Rue des Oliviers, 75001 Paris' }}</p>
+        <p class="hero-owner">Propriétaire: M. Jean Dupont</p>
+      </div>
+      <div class="price-badge">{{ apartment.price | number }}€/mois</div>
+    </div>
+  </div>
+
+  <!-- SUMMARY CARDS -->
+  <div class="summary-grid" *ngIf="apartment">
+
+    <!-- CONTRACT -->
+    <div class="summary-card">
+      <div class="summary-icon green">📋</div>
+      <div class="summary-info">
+        <span class="summary-label">Mon Contrat</span>
+        <span class="summary-value">{{ contract ? contract.status : 'Aucun' }}</span>
+        <span class="summary-sub" *ngIf="contract">
+          Expire le {{ contract.date_fin }}
+        </span>
+      </div>
+    </div>
+
+    <!-- FACTURES -->
+    <div class="summary-card">
+      <div class="summary-icon gold">🧾</div>
+      <div class="summary-info">
+        <span class="summary-label">Mes Factures</span>
+        <span class="summary-value">{{ factures.length }}</span>
+        <span class="summary-sub">{{ pendingFactures }} en attente</span>
+      </div>
+    </div>
+
+    <!-- PAIEMENTS -->
+    <div class="summary-card">
+      <div class="summary-icon navy">💳</div>
+      <div class="summary-info">
+        <span class="summary-label">Mes Paiements</span>
+        <span class="summary-value">{{ totalPaiements | number }}€</span>
+        <span class="summary-sub">Dernier paiement</span>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- LOADING -->
+<div class="loading" *ngIf="loading">
+  <div class="spinner"></div>
+  <p>Chargement...</p>
+</div>

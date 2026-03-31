@@ -12,52 +12,66 @@ import { CommonModule } from '@angular/common';
 })
 export class DepartmentsComponent {
 
+  user     = JSON.parse(localStorage.getItem('user') || '{}');
+  isOwner  = this.user?.role === 'proprietaire';
+
   departments: any[] = [];
-  name = '';
+  showAddModal = false;
 
-  editingId: number | null = null;
-  editingName = '';
+  nom = ''; ville = ''; code_postal = ''; address = '';
 
-  constructor(private api: ApiService) {
-    this.load();
-  }
+  editingId          = null as number | null;
+  editingNom         = '';
+  editingVille       = '';
+  editingCodePostal  = '';
+  editingAddress     = '';
+
+  constructor(private api: ApiService) { this.load(); }
 
   load() {
-    this.api.getDepartments().subscribe((res: any[]) => {
-      this.departments = res;
+    this.api.getDepartments().subscribe(res => {
+      this.departments = res.map((d: any) => ({ ...d, showMenu: false }));
     });
   }
 
- add() {
-  console.log("CLICKED ADD");
+  toggleMenu(d: any) {
+    this.departments.forEach(x => { if (x !== d) x.showMenu = false; });
+    d.showMenu = !d.showMenu;
+  }
 
-  if (!this.name) return;
-
-  this.api.addDepartment({ name: this.name }).subscribe(() => {
-    this.name = '';
-    this.load();
-  });
-}
+  add() {
+    if (!this.nom || !this.ville) return;
+    this.api.addDepartment({
+      nom: this.nom, ville: this.ville,
+      code_postal: this.code_postal, address: this.address
+    }).subscribe(() => {
+      this.nom = ''; this.ville = ''; this.code_postal = ''; this.address = '';
+      this.showAddModal = false;
+      this.load();
+    });
+  }
 
   delete(id: number) {
-    this.api.deleteDepartment(id).subscribe(() => {
-      this.load();
-    });
+    if (!confirm('Supprimer ce département ?')) return;
+    this.api.deleteDepartment(id).subscribe(() => this.load());
   }
 
-  startEdit(dep: any) {
-    this.editingId = dep.id;
-    this.editingName = dep.name;
+  startEdit(d: any) {
+    this.editingId         = d.id;
+    this.editingNom        = d.nom;
+    this.editingVille      = d.ville;
+    this.editingCodePostal = d.code_postal;
+    this.editingAddress    = d.address;
+    d.showMenu = false;
   }
+
+  cancelEdit() { this.editingId = null; }
 
   saveEdit() {
-  if (this.editingId === null) return;
-
-  this.api.updateDepartment(this.editingId, { name: this.editingName })
-    .subscribe(() => {
-      this.editingId = null;
-      this.editingName = '';
-      this.load();
-    });
-}
+    if (this.editingId === null) return;
+    this.api.updateDepartment(this.editingId, {
+      nom: this.editingNom, ville: this.editingVille,
+      code_postal: this.editingCodePostal, address: this.editingAddress
+    }).subscribe(() => { this.editingId = null; this.load(); });
+  }
 }
