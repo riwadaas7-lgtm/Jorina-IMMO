@@ -250,8 +250,10 @@
   align-items: center;
   gap: 6px;
   transition: all 0.2s;
+  text-decoration: none;
 }
 .btn-dl:hover { background: var(--bg); border-color: var(--navy); }
+.btn-dl:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .btn-delete {
   margin-left: auto;

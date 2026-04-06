@@ -27,7 +27,8 @@ export class ContractsComponent implements OnInit {
     date_debut:   '',
     date_fin:     '',
     montant_total: 0,
-    caution:       0
+    caution:       0,
+    contract_file: ''
   };
 
   constructor(private api: ApiService) {}
@@ -100,6 +101,15 @@ export class ContractsComponent implements OnInit {
     });
   }
 
+  onSelectContractFile(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    this.api.uploadImage(file).subscribe((res) => {
+      this.form.contract_file = res.url;
+    });
+  }
+
   delete(id: number) {
     if (!confirm('Supprimer ce contrat ?')) return;
     this.api.deleteContract(id).subscribe(() => this.loadContracts());
@@ -113,7 +123,8 @@ export class ContractsComponent implements OnInit {
     this.form = {
       tenant_id: '', apartment_id: '',
       date_debut: '', date_fin: '',
-      montant_total: 0, caution: 0
+      montant_total: 0, caution: 0,
+      contract_file: ''
     };
   }
 }

@@ -8,6 +8,12 @@ export class ApiService {
 
   constructor(private http: HttpClient) {}
 
+  uploadImage(file: File) {
+    const form = new FormData();
+    form.append('file', file);
+    return this.http.post<{ url: string }>(this.baseUrl + '/upload-image', form);
+  }
+
   // AUTH
   login(data: any) {
     return this.http.post(this.baseUrl + '/login', data);
@@ -31,6 +37,10 @@ export class ApiService {
   }
 
   // APARTMENTS
+  getAllApartments() {
+    return this.http.get<any[]>(this.baseUrl + '/apartments');
+  }
+
   getApartments(userId: number) {
   return this.http.get<any[]>(`${this.baseUrl}/apartments/user/${userId}`);
 }
@@ -68,6 +78,10 @@ export class ApiService {
   // USERS
   getUsers() {
     return this.http.get<any[]>(this.baseUrl + '/users');
+  }
+
+  updateUser(id: number, data: any) {
+    return this.http.put(this.baseUrl + '/users/' + id, data);
   }
 
   addUser(data: any) {

@@ -1,60 +1,33 @@
 <div class="page">
-
-  <!-- HEADER -->
   <div class="page-header">
     <h2 class="page-title">Gestion des Locataires</h2>
     <button class="btn-add" (click)="showAddModal = true">+ Ajouter</button>
   </div>
 
-  <!-- STAT CARDS -->
   <div class="stats-row">
-    <div class="stat-card">
-      <span class="stat-label">Total</span>
-      <span class="stat-value">{{ users.length }}</span>
-    </div>
-    <div class="stat-card">
-      <span class="stat-label">Actifs</span>
-      <span class="stat-value green">{{ countActifs() }}</span>
-    </div>
-    <div class="stat-card">
-      <span class="stat-label">En retard</span>
-      <span class="stat-value red">{{ countEnRetard() }}</span>
-    </div>
-    <div class="stat-card">
-      <span class="stat-label">Anciens</span>
-      <span class="stat-value gray">{{ countAnciens() }}</span>
-    </div>
+    <div class="stat-card"><span class="stat-label">Total</span><span class="stat-value">{{ users.length }}</span></div>
+    <div class="stat-card"><span class="stat-label">Actifs</span><span class="stat-value green">{{ countActifs() }}</span></div>
+    <div class="stat-card"><span class="stat-label">En retard</span><span class="stat-value red">{{ countEnRetard() }}</span></div>
+    <div class="stat-card"><span class="stat-label">Anciens</span><span class="stat-value gray">{{ countAnciens() }}</span></div>
   </div>
 
-  <!-- SEARCH + FILTER -->
   <div class="search-filter">
     <div class="search-inner">
-      <span>🔍</span>
-      <input type="text"
-             placeholder="Rechercher par nom, email ou appartement..."
-             [(ngModel)]="searchTerm" />
+      <span>??</span>
+      <input type="text" placeholder="Rechercher par nom, email ou appartement..." [(ngModel)]="searchTerm" />
     </div>
-    <button class="btn-filter">⚙ Filtrer</button>
+    <button class="btn-filter">Filtrer</button>
   </div>
 
-  <!-- TABS -->
   <div class="tabs">
-    <button class="tab" [class.active]="activeTab === 'tous'"
-            (click)="activeTab = 'tous'">Tous</button>
-    <button class="tab" [class.active]="activeTab === 'actif'"
-            (click)="activeTab = 'actif'">Actifs</button>
-    <button class="tab" [class.active]="activeTab === 'retard'"
-            (click)="activeTab = 'retard'">En retard</button>
-    <button class="tab" [class.active]="activeTab === 'ancien'"
-            (click)="activeTab = 'ancien'">Anciens</button>
+    <button class="tab" [class.active]="activeTab === 'tous'" (click)="activeTab = 'tous'">Tous</button>
+    <button class="tab" [class.active]="activeTab === 'actif'" (click)="activeTab = 'actif'">Actifs</button>
+    <button class="tab" [class.active]="activeTab === 'retard'" (click)="activeTab = 'retard'">En retard</button>
+    <button class="tab" [class.active]="activeTab === 'ancien'" (click)="activeTab = 'ancien'">Anciens</button>
   </div>
 
-  <!-- CARDS GRID -->
   <div class="users-grid">
-
     <div class="user-card" *ngFor="let u of filtered()">
-
-      <!-- TOP ROW -->
       <div class="card-top">
         <div class="user-left">
           <div class="avatar-circle">{{ initials(u) }}</div>
@@ -63,56 +36,40 @@
             <p class="user-since">Depuis le {{ u.since || '01/01/2026' }}</p>
           </div>
         </div>
-        <span class="status-badge" [ngClass]="u.statut || 'actif'">
-          {{ statusLabel(u.statut || 'actif') }}
-        </span>
+        <span class="status-badge" [ngClass]="u.statut || 'actif'">{{ statusLabel(u.statut || 'actif') }}</span>
       </div>
 
-      <!-- DETAILS -->
       <div class="card-details">
-        <div class="detail-row">
-          <span class="detail-icon">🏠</span>
-          <span>{{ u.apartment_nom || 'Appartement non assigné' }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-icon">📍</span>
-          <span>{{ u.ville || '—' }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-icon">✉️</span>
-          <span>{{ u.email }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-icon">📞</span>
-          <span>{{ u.telephone || '—' }}</span>
+        <div class="detail-row"><span class="detail-icon">??</span><span>{{ u.apartment_nom || 'Appartement non assigne' }}</span></div>
+        <div class="detail-row"><span class="detail-icon">??</span><span>{{ u.ville || '-' }}</span></div>
+        <div class="detail-row"><span class="detail-icon">??</span><span>{{ u.email }}</span></div>
+        <div class="detail-row"><span class="detail-icon">??</span><span>{{ u.telephone || '-' }}</span></div>
+
+        <div class="tenant-code-wrap">
+          <div class="tenant-code-text">
+            <strong>Code locataire:</strong> {{ u.tenant_code || '-' }}
+          </div>
+          <img class="tenant-qr" [src]="u.qr_url" [alt]="'QR ' + (u.tenant_code || '')" />
         </div>
       </div>
 
-      <!-- FOOTER -->
       <div class="card-footer">
         <div>
           <p class="loyer-label">Loyer mensuel</p>
-          <p class="loyer-value">{{ u.loyer || 0 | number }}€</p>
+          <p class="loyer-value">{{ u.loyer || 0 | number }} EUR</p>
         </div>
         <div class="contact-actions">
-          <button class="contact-btn" title="Envoyer un email">✉️</button>
-          <button class="contact-btn" title="Appeler">📞</button>
+          <button class="contact-btn" title="Envoyer un email">??</button>
+          <button class="contact-btn" title="Appeler">??</button>
         </div>
       </div>
-
     </div>
-
   </div>
 
-  <!-- EMPTY -->
-  <div class="empty" *ngIf="filtered().length === 0">
-    Aucun locataire trouvé.
-  </div>
+  <div class="empty" *ngIf="filtered().length === 0">Aucun locataire trouve.</div>
 
-  <!-- ADD MODAL -->
   <div class="modal-overlay" *ngIf="showAddModal" (click)="showAddModal = false">
     <div class="modal" (click)="$event.stopPropagation()">
-
       <h3>Ajouter un Locataire</h3>
 
       <div class="fields-row">
@@ -121,7 +78,7 @@
           <input [(ngModel)]="form.nom" placeholder="Dupont" />
         </div>
         <div class="field">
-          <label>Prénom</label>
+          <label>Prenom</label>
           <input [(ngModel)]="form.prenom" placeholder="Marie" />
         </div>
       </div>
@@ -132,21 +89,19 @@
       </div>
 
       <div class="field">
-        <label>Téléphone</label>
-        <input [(ngModel)]="form.telephone" placeholder="06 12 34 56 78" />
+        <label>Telephone</label>
+        <input [(ngModel)]="form.telephone" placeholder="+21612345678" />
       </div>
 
       <div class="field">
         <label>Mot de passe</label>
-        <input type="password" [(ngModel)]="form.password" placeholder="••••••••" />
+        <input type="password" [(ngModel)]="form.password" placeholder="********" />
       </div>
 
       <div class="modal-actions">
         <button class="btn-cancel" (click)="showAddModal = false">Annuler</button>
         <button class="btn-save" (click)="add()">Ajouter</button>
       </div>
-
     </div>
   </div>
-
 </div>

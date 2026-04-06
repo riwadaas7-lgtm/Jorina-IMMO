@@ -1,14 +1,9 @@
 <div class="page">
-
-  <!-- HEADER -->
   <div class="page-header">
     <h2 class="page-title">Gestion des Contrats</h2>
-    <button class="btn-add" (click)="showAddModal = true">
-      📄 Nouveau Contrat
-    </button>
+    <button class="btn-add" (click)="showAddModal = true">Nouveau Contrat</button>
   </div>
 
-  <!-- STAT CARDS -->
   <div class="stats-row">
     <div class="stat-card">
       <span class="stat-label">Total</span>
@@ -19,61 +14,46 @@
       <span class="stat-value green">{{ countByStatus('actif') }}</span>
     </div>
     <div class="stat-card">
-      <span class="stat-label">À renouveler</span>
+      <span class="stat-label">A renouveler</span>
       <span class="stat-value orange">{{ countByStatus('renouveler') }}</span>
     </div>
     <div class="stat-card">
-      <span class="stat-label">Expirés</span>
+      <span class="stat-label">Expires</span>
       <span class="stat-value red">{{ countByStatus('expire') }}</span>
     </div>
   </div>
 
-  <!-- SEARCH -->
   <div class="search-filter">
     <div class="search-inner">
-      <span>🔍</span>
-      <input type="text"
-             placeholder="Rechercher par locataire ou appartement..."
-             [(ngModel)]="searchTerm" />
+      <span>??</span>
+      <input type="text" placeholder="Rechercher par locataire ou appartement..." [(ngModel)]="searchTerm" />
     </div>
-    <button class="btn-filter">⚙ Filtrer</button>
+    <button class="btn-filter">Filtrer</button>
   </div>
 
-  <!-- TABS -->
   <div class="tabs">
-    <button class="tab" [class.active]="activeTab === 'tous'"
-            (click)="activeTab = 'tous'">Tous</button>
-    <button class="tab" [class.active]="activeTab === 'actif'"
-            (click)="activeTab = 'actif'">Actifs</button>
-    <button class="tab" [class.active]="activeTab === 'renouveler'"
-            (click)="activeTab = 'renouveler'">À renouveler</button>
-    <button class="tab" [class.active]="activeTab === 'expire'"
-            (click)="activeTab = 'expire'">Expirés</button>
+    <button class="tab" [class.active]="activeTab === 'tous'" (click)="activeTab = 'tous'">Tous</button>
+    <button class="tab" [class.active]="activeTab === 'actif'" (click)="activeTab = 'actif'">Actifs</button>
+    <button class="tab" [class.active]="activeTab === 'renouveler'" (click)="activeTab = 'renouveler'">A renouveler</button>
+    <button class="tab" [class.active]="activeTab === 'expire'" (click)="activeTab = 'expire'">Expires</button>
   </div>
 
-  <!-- CONTRACT LIST -->
   <div class="contracts-list">
-
     <div class="contract-card" *ngFor="let c of filtered()">
-
-      <!-- TOP -->
       <div class="contract-top">
         <div class="contract-left">
-          <div class="doc-icon">📄</div>
+          <div class="doc-icon">??</div>
           <div>
-            <h3 class="tenant-name">{{ c.tenant_name || 'Locataire #' + c.tenant_id }}</h3>
-            <p class="apt-name">{{ c.apartment_name || 'Appartement #' + c.apartment_id }}</p>
+            <h3 class="tenant-name">{{ c.tenant_name || ('Locataire #' + c.tenant_id) }}</h3>
+            <p class="apt-name">{{ c.apartment_name || ('Appartement #' + c.apartment_id) }}</p>
           </div>
         </div>
-        <span class="status-badge" [ngClass]="c.status">
-          {{ statusLabel(c.status) }}
-        </span>
+        <span class="status-badge" [ngClass]="c.status">{{ statusLabel(c.status) }}</span>
       </div>
 
-      <!-- INFO ROW -->
       <div class="contract-info">
         <div class="info-col">
-          <span class="info-label">Date début</span>
+          <span class="info-label">Date debut</span>
           <span class="info-value">{{ c.date_debut }}</span>
         </div>
         <div class="info-col">
@@ -81,44 +61,35 @@
           <span class="info-value">{{ c.date_fin }}</span>
         </div>
         <div class="info-col">
-          <span class="info-label">Loyer mensuel</span>
-          <span class="info-value gold">{{ c.montant_total | number }}€</span>
+          <span class="info-label">Loyer</span>
+          <span class="info-value gold">{{ c.montant_total | number }} EUR</span>
         </div>
         <div class="info-col">
-          <span class="info-label">Dépôt de garantie</span>
-          <span class="info-value">{{ c.caution | number }}€</span>
+          <span class="info-label">Caution</span>
+          <span class="info-value">{{ c.caution | number }} EUR</span>
         </div>
       </div>
 
-      <!-- ACTIONS -->
       <div class="contract-actions">
-        <button class="btn-voir" (click)="viewContract(c)">👁 Voir</button>
-        <button class="btn-dl">⬇ Télécharger</button>
-        <button class="btn-delete" (click)="delete(c.id)">🗑️</button>
+        <button class="btn-voir" (click)="viewContract(c)">Voir</button>
+        <a class="btn-dl" *ngIf="c.contract_file" [href]="c.contract_file" target="_blank">Telecharger</a>
+        <button class="btn-dl" *ngIf="!c.contract_file" disabled>Aucun fichier</button>
+        <button class="btn-delete" (click)="delete(c.id)">Supprimer</button>
       </div>
-
     </div>
-
   </div>
 
-  <!-- EMPTY -->
-  <div class="empty" *ngIf="filtered().length === 0">
-    Aucun contrat trouvé.
-  </div>
+  <div class="empty" *ngIf="filtered().length === 0">Aucun contrat trouve.</div>
 
-  <!-- ADD MODAL -->
   <div class="modal-overlay" *ngIf="showAddModal" (click)="showAddModal = false">
     <div class="modal" (click)="$event.stopPropagation()">
-
       <h3>Nouveau Contrat</h3>
 
       <div class="field">
         <label>Locataire</label>
         <select [(ngModel)]="form.tenant_id">
           <option value="">-- Choisir un locataire --</option>
-          <option *ngFor="let u of tenants" [value]="u.id">
-            {{ u.prenom }} {{ u.nom }}
-          </option>
+          <option *ngFor="let u of tenants" [value]="u.id">{{ u.prenom }} {{ u.nom }}</option>
         </select>
       </div>
 
@@ -126,15 +97,13 @@
         <label>Appartement</label>
         <select [(ngModel)]="form.apartment_id">
           <option value="">-- Choisir un appartement --</option>
-          <option *ngFor="let a of apartments" [value]="a.id">
-            {{ a.nom }}
-          </option>
+          <option *ngFor="let a of apartments" [value]="a.id">{{ a.nom }}</option>
         </select>
       </div>
 
       <div class="fields-row">
         <div class="field">
-          <label>Date début</label>
+          <label>Date debut</label>
           <input type="date" [(ngModel)]="form.date_debut" />
         </div>
         <div class="field">
@@ -145,69 +114,54 @@
 
       <div class="fields-row">
         <div class="field">
-          <label>Loyer mensuel (€)</label>
+          <label>Loyer mensuel</label>
           <input type="number" [(ngModel)]="form.montant_total" placeholder="1200" />
         </div>
         <div class="field">
-          <label>Dépôt de garantie (€)</label>
+          <label>Caution</label>
           <input type="number" [(ngModel)]="form.caution" placeholder="2400" />
         </div>
       </div>
 
-      <div class="modal-actions">
-        <button class="btn-cancel" (click)="showAddModal = false">Annuler</button>
-        <button class="btn-save" (click)="add()">Créer</button>
+      <div class="field">
+        <label>Image du contrat</label>
+        <input type="file" accept="image/*" (change)="onSelectContractFile($event)" />
+        <small *ngIf="form.contract_file">Fichier charge</small>
       </div>
 
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="showAddModal = false">Annuler</button>
+        <button class="btn-save" (click)="add()">Creer</button>
+      </div>
     </div>
   </div>
 
-  <!-- VIEW MODAL -->
   <div class="modal-overlay" *ngIf="viewingContract" (click)="viewingContract = null">
     <div class="modal modal-wide" (click)="$event.stopPropagation()">
-
       <div class="view-header">
         <div>
           <h3>Contrat de Location</h3>
           <p class="view-sub">{{ viewingContract.tenant_name }}</p>
         </div>
-        <span class="status-badge" [ngClass]="viewingContract.status">
-          {{ statusLabel(viewingContract.status) }}
-        </span>
+        <span class="status-badge" [ngClass]="viewingContract.status">{{ statusLabel(viewingContract.status) }}</span>
       </div>
 
       <div class="view-grid">
-        <div class="view-field">
-          <span class="view-label">Locataire</span>
-          <span class="view-val">{{ viewingContract.tenant_name || '—' }}</span>
-        </div>
-        <div class="view-field">
-          <span class="view-label">Appartement</span>
-          <span class="view-val">{{ viewingContract.apartment_name || '—' }}</span>
-        </div>
-        <div class="view-field">
-          <span class="view-label">Date début</span>
-          <span class="view-val">{{ viewingContract.date_debut }}</span>
-        </div>
-        <div class="view-field">
-          <span class="view-label">Date fin</span>
-          <span class="view-val">{{ viewingContract.date_fin }}</span>
-        </div>
-        <div class="view-field">
-          <span class="view-label">Loyer mensuel</span>
-          <span class="view-val gold">{{ viewingContract.montant_total | number }}€</span>
-        </div>
-        <div class="view-field">
-          <span class="view-label">Dépôt de garantie</span>
-          <span class="view-val">{{ viewingContract.caution | number }}€</span>
+        <div class="view-field"><span class="view-label">Locataire</span><span class="view-val">{{ viewingContract.tenant_name || '-' }}</span></div>
+        <div class="view-field"><span class="view-label">Appartement</span><span class="view-val">{{ viewingContract.apartment_name || '-' }}</span></div>
+        <div class="view-field"><span class="view-label">Date debut</span><span class="view-val">{{ viewingContract.date_debut }}</span></div>
+        <div class="view-field"><span class="view-label">Date fin</span><span class="view-val">{{ viewingContract.date_fin }}</span></div>
+        <div class="view-field"><span class="view-label">Loyer</span><span class="view-val gold">{{ viewingContract.montant_total | number }} EUR</span></div>
+        <div class="view-field"><span class="view-label">Caution</span><span class="view-val">{{ viewingContract.caution | number }} EUR</span></div>
+        <div class="view-field" *ngIf="viewingContract.contract_file">
+          <span class="view-label">Fichier contrat</span>
+          <a class="view-val gold" [href]="viewingContract.contract_file" target="_blank">Ouvrir l'image</a>
         </div>
       </div>
 
       <div class="modal-actions">
         <button class="btn-cancel" (click)="viewingContract = null">Fermer</button>
       </div>
-
     </div>
   </div>
-
 </div>

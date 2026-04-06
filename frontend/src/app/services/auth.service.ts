@@ -22,7 +22,15 @@ export class AuthService {
   }
 
   getUser(): any {
-    return JSON.parse(localStorage.getItem('user') || '{}');
+    try {
+      return JSON.parse(localStorage.getItem('user') || '{}');
+    } catch {
+      return {};
+    }
+  }
+
+  setUser(user: any): void {
+    localStorage.setItem('user', JSON.stringify(user || {}));
   }
 
   getRole(): string {
@@ -39,9 +47,9 @@ export class AuthService {
 
   redirectAfterLogin(): void {
     if (this.isProprietaire()) {
-      this.router.navigate(['/app/departments']);
+      this.router.navigate(['/departments']);
     } else {
-      this.router.navigate(['/app/my-apartment']);
+      this.router.navigate(['/my-apartment']);
     }
   }
 }

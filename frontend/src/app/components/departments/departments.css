@@ -33,12 +33,34 @@
   position: relative;
   height: 200px;
   overflow: hidden;
+  background: linear-gradient(135deg, #d9dde7, #c6ccd9);
 }
 
 .dept-photo img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.28s ease;
+}
+
+.dept-photo img.is-loaded {
+  opacity: 1;
+}
+
+.dept-photo-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dept-photo-placeholder span {
+  font-size: 28px;
+  font-weight: 800;
+  color: #5b6578;
+  letter-spacing: 1px;
 }
 
 .menu-btn {
@@ -89,6 +111,7 @@
 
 /* DEPT INFO */
 .dept-info { padding: 16px; }
+.dept-info { cursor: pointer; }
 
 .dept-header {
   display: flex;
@@ -109,16 +132,6 @@
   margin-top: 2px;
 }
 
-.price-badge {
-  background: var(--gold);
-  color: var(--white);
-  font-weight: 700;
-  font-size: 13px;
-  padding: 4px 10px;
-  border-radius: 20px;
-  white-space: nowrap;
-}
-
 .dept-stats {
   display: flex;
   align-items: center;
@@ -126,20 +139,76 @@
   margin-top: 8px;
 }
 
+.dept-stats.one-col {
+  justify-content: flex-start;
+}
+
 .stat {
   color: var(--muted);
   font-size: 13px;
 }
 
-.status-badge {
-  font-size: 12px;
-  font-weight: 600;
-  padding: 3px 10px;
-  border-radius: 20px;
+.dept-apartments {
+  border-top: 1px solid var(--border);
+  padding: 14px 16px 16px;
+  background: #fafbff;
 }
 
-.status-badge.actif  { background: #dcfce7; color: #16a34a; }
-.status-badge.complet { background: #dbeafe; color: #2563eb; }
+.dept-apartments h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 10px;
+}
+
+.dept-apt-empty {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.dept-apt-list,
+.edit-apt-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.edit-apt-list {
+  margin-top: 10px;
+  max-height: 180px;
+  overflow: auto;
+}
+
+.dept-apt-item {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dept-apt-meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.btn-delete-apt {
+  border: none;
+  background: #fee2e2;
+  color: #b91c1c;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.btn-delete-apt:hover {
+  background: #fecaca;
+}
 
 /* EMPTY */
 .empty {
@@ -147,6 +216,76 @@
   color: var(--muted);
   padding: 60px 0;
   font-size: 16px;
+}
+
+.load-error {
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  color: #9f1239;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 8px 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.btn-retry {
+  border: none;
+  background: #be123c;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.btn-retry:hover {
+  background: #9f1239;
+}
+
+.skeleton-card {
+  box-shadow: var(--shadow);
+}
+
+.skeleton {
+  border-radius: 10px;
+  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.15s linear infinite;
+}
+
+.skeleton-photo {
+  height: 200px;
+  border-radius: 0;
+}
+
+.skeleton-title {
+  height: 18px;
+  width: 62%;
+  margin-bottom: 10px;
+}
+
+.skeleton-subtitle {
+  height: 14px;
+  width: 40%;
+  margin-bottom: 16px;
+}
+
+.skeleton-line {
+  height: 12px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.skeleton-line.short {
+  width: 65%;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 /* MODAL */
@@ -175,6 +314,18 @@
 .modal h3 {
   font-size: 20px;
   font-weight: 700;
+  color: var(--navy);
+}
+
+.modal-section {
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.modal-section h4 {
+  font-size: 14px;
+  margin-bottom: 10px;
   color: var(--navy);
 }
 
@@ -225,6 +376,7 @@
 }
 
 .btn-save:hover { background: var(--gold-hover); }
+.btn-save.full { width: 100%; }
 
 /* FAB */
 .fab {

@@ -42,31 +42,32 @@ export class RegisterComponent {
   }
 
   register() {
-    if (!this.nom || !this.prenom || !this.email || !this.password) {
-      this.errorMsg = 'Veuillez remplir tous les champs obligatoires.';
-      return;
-    }
-
-    this.loading  = true;
-    this.errorMsg = '';
-
-    this.api.register({
-      nom:       this.nom,
-      prenom:    this.prenom,
-      email:     this.email,
-      password:  this.password,
-      telephone: this.telephone,
-      cin:       this.cin,
-      role:      this.role
-    }).subscribe({
-      next: (res: any) => {
-        this.auth.login(res);           // ✅ saves token + user via AuthService
-        this.auth.redirectAfterLogin(); // ✅ role-based redirect
-      },
-      error: (err) => {
-        this.errorMsg = err.error?.detail || 'Erreur lors de l\'inscription.';
-        this.loading  = false;
-      }
-    });
+  if (!this.nom || !this.prenom || !this.email || !this.password) {
+    this.errorMsg = 'Veuillez remplir tous les champs obligatoires.';
+    return;
   }
-}
+
+  this.loading  = true;
+  this.errorMsg = '';
+
+  this.api.register({
+    nom: this.nom,
+    prenom: this.prenom,
+    email: this.email,
+    password: this.password,
+    telephone: this.telephone,
+    cin: '',
+    role: this.role
+  }).subscribe({
+    next: (res: any) => {
+      localStorage.setItem('token', res.access_token);
+      localStorage.setItem('user', JSON.stringify(res.user));
+      this.auth.redirectAfterLogin();
+    },
+    error: (err) => {
+      console.error('Register error:', err); // 👈 open browser console to see this
+      this.errorMsg = err.error?.detail || 'Erreur lors de l\'inscription. Vérifiez que le serveur est démarré.';
+      this.loading  = false;
+    }
+  });
+  }}

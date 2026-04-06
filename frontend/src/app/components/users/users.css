@@ -214,6 +214,29 @@
 
 .detail-icon { font-size: 15px; width: 20px; text-align: center; }
 
+.tenant-code-wrap {
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tenant-code-text {
+  font-size: 12px;
+  color: var(--text);
+}
+
+.tenant-qr {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #fff;
+}
+
 /* FOOTER */
 .card-footer {
   display: flex;

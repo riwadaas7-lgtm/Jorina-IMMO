@@ -9,10 +9,12 @@ import { MyApartmentComponent } from './components/my-apartment/my-apartment';
 import { AuthGuard } from './auth.guard';
 import { LoginComponent } from './components/login/login';
 import { RegisterComponent } from './components/register/register';
+import { GuestGuard } from './guest.guard';
 
 export const routes: Routes = [
-  { path: 'login',    component: LoginComponent },
-  { path: 'register', component: RegisterComponent },
+  { path: '', pathMatch: 'full', redirectTo: 'login' },
+  { path: 'login',    component: LoginComponent, canActivate: [GuestGuard] },
+  { path: 'register', component: RegisterComponent, canActivate: [GuestGuard] },
 
   {
     path: '',

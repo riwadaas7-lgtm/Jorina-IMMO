@@ -34,8 +34,17 @@ export class UsersComponent implements OnInit {
   loadUsers() {
     this.api.getUsers().subscribe((res: any[]) => {
       // only show locataires
-      this.users = res.filter(u => u.role === 'locataire');
+      this.users = res
+        .filter(u => u.role === 'locataire')
+        .map(u => ({
+          ...u,
+          qr_url: this.qrUrl(u.tenant_code || 'NO-CODE')
+        }));
     });
+  }
+
+  qrUrl(value: string) {
+    return `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(value)}`;
   }
 
   initials(u: any) {

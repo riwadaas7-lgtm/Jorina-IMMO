@@ -1,19 +1,17 @@
 <div class="page">
 
-  <!-- HEADER -->
   <div class="page-header">
     <h2 class="page-title">Gestion des Appartements</h2>
     <button class="btn-add" (click)="showAddModal = true">+ Ajouter</button>
   </div>
 
-  <!-- STAT CARDS -->
   <div class="stats-row">
     <div class="stat-card">
       <span class="stat-label">Total</span>
       <span class="stat-value">{{ apartments.length }}</span>
     </div>
     <div class="stat-card">
-      <span class="stat-label">Occupés</span>
+      <span class="stat-label">Occupes</span>
       <span class="stat-value green">{{ countByStatus('occupe') }}</span>
     </div>
     <div class="stat-card">
@@ -26,34 +24,33 @@
     </div>
   </div>
 
-  <!-- SEARCH -->
   <div class="search-filter">
     <div class="search-inner">
-      <span>🔍</span>
-      <input type="text"
-             placeholder="Rechercher par nom, département, ville ou locataire..."
-             [(ngModel)]="searchTerm" />
+      <span>??</span>
+      <input
+        type="text"
+        placeholder="Rechercher par nom, departement, ville ou locataire..."
+        [(ngModel)]="searchTerm"
+      />
     </div>
-    <button class="btn-filter">⚙ Filtrer</button>
+    <button class="btn-filter">Filtrer</button>
   </div>
 
-  <!-- TABS -->
   <div class="tabs">
-    <button class="tab" [class.active]="activeTab === 'tous'"
-            (click)="activeTab = 'tous'">Tous</button>
-    <button class="tab" [class.active]="activeTab === 'occupe'"
-            (click)="activeTab = 'occupe'">Occupés</button>
-    <button class="tab" [class.active]="activeTab === 'libre'"
-            (click)="activeTab = 'libre'">Disponibles</button>
-    <button class="tab" [class.active]="activeTab === 'maintenance'"
-            (click)="activeTab = 'maintenance'">Maintenance</button>
+    <button class="tab" [class.active]="activeTab === 'tous'" (click)="activeTab = 'tous'">Tous</button>
+    <button class="tab" [class.active]="activeTab === 'occupe'" (click)="activeTab = 'occupe'">Occupes</button>
+    <button class="tab" [class.active]="activeTab === 'libre'" (click)="activeTab = 'libre'">Disponibles</button>
+    <button class="tab" [class.active]="activeTab === 'maintenance'" (click)="activeTab = 'maintenance'">Maintenance</button>
   </div>
 
-  <!-- APARTMENT CARDS -->
   <div class="apt-grid">
     <div class="apt-card" *ngFor="let a of filtered()">
-
-      <div class="apt-icon">🏠</div>
+      <div class="apt-icon" *ngIf="a.photo; else defaultIcon">
+        <img [src]="a.photo" [alt]="a.nom" />
+      </div>
+      <ng-template #defaultIcon>
+        <div class="apt-icon">??</div>
+      </ng-template>
 
       <div class="apt-body">
         <div class="apt-top">
@@ -62,79 +59,77 @@
             {{ statusLabel(a.status) }}
           </span>
         </div>
-        <p class="apt-sub">{{ a.etage ? a.etage + 'ème étage' : '' }}
-          {{ a.description }}</p>
+        <p class="apt-sub">{{ a.etage ? a.etage + 'eme etage' : '' }} {{ a.description }}</p>
         <div class="apt-footer">
-          <span class="apt-price">{{ a.price | number }}€/mois</span>
+          <span class="apt-price">{{ a.price | number }}EUR/mois</span>
           <div class="apt-actions">
-            <button class="btn-icon edit" (click)="startEdit(a)" title="Modifier">✏️</button>
-            <button class="btn-icon del"  (click)="delete(a.id)" title="Supprimer">🗑️</button>
+            <button class="btn-icon edit" (click)="startEdit(a)" title="Modifier">??</button>
+            <button class="btn-icon del" (click)="delete(a.id)" title="Supprimer">???</button>
           </div>
         </div>
       </div>
-
     </div>
   </div>
 
-  <!-- EMPTY -->
-  <div class="empty" *ngIf="filtered().length === 0">
-    Aucun appartement trouvé.
-  </div>
+  <div class="empty" *ngIf="filtered().length === 0">Aucun appartement trouve.</div>
 
-  <!-- ADD MODAL -->
   <div class="modal-overlay" *ngIf="showAddModal" (click)="showAddModal = false">
     <div class="modal" (click)="$event.stopPropagation()">
       <h3>Nouvel Appartement</h3>
 
       <div class="field">
-        <label>Nom / Numéro</label>
+        <label>Nom / Numero</label>
         <input [(ngModel)]="form.nom" placeholder="A101" />
       </div>
       <div class="fields-row">
         <div class="field">
-          <label>Étage</label>
+          <label>Etage</label>
           <input type="number" [(ngModel)]="form.etage" placeholder="1" />
         </div>
         <div class="field">
-          <label>Prix (€/mois)</label>
+          <label>Prix (EUR/mois)</label>
           <input type="number" [(ngModel)]="form.price" placeholder="1200" />
         </div>
       </div>
       <div class="field">
         <label>Description</label>
-        <input [(ngModel)]="form.description" placeholder="65m² • 2 ch." />
+        <input [(ngModel)]="form.description" placeholder="65m2 - 2 ch." />
       </div>
       <div class="field">
-        <label>Département</label>
+        <label>Departement</label>
         <select [(ngModel)]="form.department_id">
           <option value="">-- Choisir --</option>
           <option *ngFor="let d of departments" [value]="d.id">{{ d.nom }}</option>
         </select>
       </div>
+      <div class="field">
+        <label>Image</label>
+        <input type="file" accept="image/*" (change)="onSelectPhoto($event)" />
+        <small *ngIf="form.photo">Image chargee</small>
+      </div>
 
       <div class="modal-actions">
         <button class="btn-cancel" (click)="showAddModal = false">Annuler</button>
-        <button class="btn-save"   (click)="add()">Ajouter</button>
+        <button class="btn-save" (click)="add()">Ajouter</button>
       </div>
     </div>
   </div>
 
-  <!-- EDIT MODAL -->
   <div class="modal-overlay" *ngIf="editingId !== null" (click)="cancelEdit()">
     <div class="modal" (click)="$event.stopPropagation()">
       <h3>Modifier l'Appartement</h3>
 
       <div class="field">
-        <label>Nom / Numéro</label>
+        <label>Nom / Numero</label>
         <input [(ngModel)]="form.nom" />
       </div>
       <div class="fields-row">
         <div class="field">
-          <label>Étage</label>
+          <label>Etage</label>
           <input type="number" [(ngModel)]="form.etage" />
         </div>
         <div class="field">
-          <label>Prix (€/mois)</label>
+          <label>Prix (EUR/mois)</label>
           <input type="number" [(ngModel)]="form.price" />
         </div>
       </div>
@@ -146,14 +141,19 @@
         <label>Statut</label>
         <select [(ngModel)]="form.status">
           <option value="libre">Disponible</option>
-          <option value="occupe">Occupé</option>
+          <option value="occupe">Occupe</option>
           <option value="maintenance">Maintenance</option>
         </select>
+      </div>
+      <div class="field">
+        <label>Image</label>
+        <input type="file" accept="image/*" (change)="onSelectPhoto($event)" />
+        <small *ngIf="form.photo">Image chargee</small>
       </div>
 
       <div class="modal-actions">
         <button class="btn-cancel" (click)="cancelEdit()">Annuler</button>
-        <button class="btn-save"   (click)="saveEdit()">Enregistrer</button>
+        <button class="btn-save" (click)="saveEdit()">Enregistrer</button>
       </div>
     </div>
   </div>

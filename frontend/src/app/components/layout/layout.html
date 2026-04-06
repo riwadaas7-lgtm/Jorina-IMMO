@@ -1,140 +1,104 @@
-<div class="app-shell">
-
-  <!-- ═══ SIDEBAR ═══ -->
+﻿<div class="app-shell">
   <aside class="sidebar">
-
     <div class="sidebar-logo">
-      <span class="logo-icon">🏢</span>
+      <span class="logo-icon">&#127970;</span>
       <span class="logo-text">JORILINA IMMO</span>
     </div>
 
     <nav class="sidebar-nav">
-
-      <!-- SHARED -->
-      <a routerLink="/dashboard"
-         routerLinkActive="active"
-         class="nav-item">
-        <span class="nav-icon">⊞</span>
+      <div class="nav-item disabled" aria-disabled="true" title="Bientot disponible">
+        <span class="nav-icon">&#128202;</span>
         <span>Dashboard</span>
-      </a>
+        <span class="soon-tag">Bientot</span>
+      </div>
 
-      <!-- PROPRIÉTAIRE LINKS -->
       <ng-container *ngIf="isOwner">
-
-        <a routerLink="/departments"
-           routerLinkActive="active"
-           class="nav-item">
-          <span class="nav-icon">🏢</span>
-          <span>Départements</span>
+        <a routerLink="/departments" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">&#127970;</span>
+          <span>Departements</span>
         </a>
 
-        <a routerLink="/apartments"
-           routerLinkActive="active"
-           class="nav-item">
-          <span class="nav-icon">🏠</span>
+        <a routerLink="/apartments" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">&#127968;</span>
           <span>Appartements</span>
         </a>
 
-        <a routerLink="/users"
-           routerLinkActive="active"
-           class="nav-item">
-          <span class="nav-icon">👤</span>
+        <a routerLink="/users" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">&#128100;</span>
           <span>Locataires</span>
         </a>
 
-        <a routerLink="/contracts"
-           routerLinkActive="active"
-           class="nav-item">
-          <span class="nav-icon">📄</span>
+        <a routerLink="/contracts" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">&#128196;</span>
           <span>Contrats</span>
         </a>
 
-        <a routerLink="/factures"
-           routerLinkActive="active"
-           class="nav-item">
-          <span class="nav-icon">🧾</span>
+        <a routerLink="/factures" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">&#128203;</span>
           <span>Factures</span>
         </a>
 
-        <a routerLink="/payments"
-           routerLinkActive="active"
-           class="nav-item">
-          <span class="nav-icon">💳</span>
+        <a routerLink="/payments" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">&#128179;</span>
           <span>Paiements</span>
         </a>
 
-        <a routerLink="/invitations"
-           routerLinkActive="active"
-           class="nav-item">
-          <span class="nav-icon">✉️</span>
+        <a routerLink="/invitations" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">&#9993;</span>
           <span>Invitations</span>
         </a>
-
       </ng-container>
 
-      <!-- LOCATAIRE LINKS -->
       <ng-container *ngIf="isLocataire">
-
-        <a routerLink="/my-apartment"
-           routerLinkActive="active"
-           class="nav-item">
-          <span class="nav-icon">🏠</span>
+        <a routerLink="/my-apartment" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">&#127968;</span>
           <span>Mon Appartement</span>
         </a>
 
-        <a routerLink="/my-contract"
-           routerLinkActive="active"
-           class="nav-item">
-          <span class="nav-icon">📄</span>
+        <a routerLink="/my-contract" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">&#128196;</span>
           <span>Mon Contrat</span>
         </a>
 
-        <a routerLink="/my-factures"
-           routerLinkActive="active"
-           class="nav-item">
-          <span class="nav-icon">🧾</span>
+        <a routerLink="/my-factures" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">&#128203;</span>
           <span>Mes Factures</span>
         </a>
 
-        <a routerLink="/my-payments"
-           routerLinkActive="active"
-           class="nav-item">
-          <span class="nav-icon">💳</span>
+        <a routerLink="/my-payments" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">&#128179;</span>
           <span>Mes Paiements</span>
         </a>
 
-        <a routerLink="/notifications"
-           routerLinkActive="active"
-           class="nav-item">
-          <span class="nav-icon">🔔</span>
+        <a routerLink="/notifications" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">&#128276;</span>
           <span>Notifications</span>
         </a>
-
       </ng-container>
-
     </nav>
 
-    <button class="logout-btn" (click)="logout()">
-      🚪 Déconnexion
-    </button>
-
+    <button class="logout-btn" (click)="logout()">&#128682; Deconnexion</button>
   </aside>
 
-  <!-- ═══ MAIN ═══ -->
   <div class="main-wrapper">
-
     <header class="topbar">
       <div class="search-box">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon">&#128269;</span>
         <input type="text" placeholder="Rechercher..." />
       </div>
       <div class="topbar-right">
         <button class="notif-btn">
-          🔔
+          &#128276;
           <span class="notif-badge">3</span>
         </button>
-        <div class="avatar">
+        <div class="avatar" (click)="toggleAccountMenu()">
           {{ user?.nom?.charAt(0) || 'U' }}
+        </div>
+        <div class="account-menu" *ngIf="showAccountMenu">
+          <p class="menu-name">{{ user?.prenom }} {{ user?.nom }}</p>
+          <p class="menu-email">{{ user?.email }}</p>
+          <button class="menu-btn" (click)="openProfileEditor()">Modifier les donnees</button>
+          <button class="menu-btn danger" (click)="logout()">Deconnexion</button>
         </div>
       </div>
     </header>
@@ -142,7 +106,37 @@
     <main class="main-content">
       <router-outlet></router-outlet>
     </main>
-
   </div>
 
+  <div class="modal-overlay" *ngIf="showProfileModal" (click)="closeProfileEditor()">
+    <div class="modal profile-modal" (click)="$event.stopPropagation()">
+      <h3>Mon Compte</h3>
+
+      <div class="field">
+        <label>Nom</label>
+        <input [(ngModel)]="profileForm.nom" />
+      </div>
+      <div class="field">
+        <label>Prenom</label>
+        <input [(ngModel)]="profileForm.prenom" />
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" [(ngModel)]="profileForm.email" />
+      </div>
+      <div class="field">
+        <label>Telephone</label>
+        <input [(ngModel)]="profileForm.telephone" />
+      </div>
+
+      <p class="profile-error" *ngIf="profileError">{{ profileError }}</p>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="closeProfileEditor()">Annuler</button>
+        <button class="btn-save" (click)="saveProfile()" [disabled]="savingProfile">
+          {{ savingProfile ? 'Enregistrement...' : 'Modifier les donnees' }}
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

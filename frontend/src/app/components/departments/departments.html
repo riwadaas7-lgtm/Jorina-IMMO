@@ -1,61 +1,93 @@
-<div class="page">
+﻿<div class="page">
+  <h2 class="page-title">Mes Departements</h2>
 
-  <h2 class="page-title">Mes Départements</h2>
+  <div class="dept-grid" *ngIf="isLoading && departments.length === 0">
+    <div class="dept-card skeleton-card" *ngFor="let _ of skeletonCards">
+      <div class="skeleton skeleton-photo"></div>
+      <div class="dept-info">
+        <div class="skeleton skeleton-title"></div>
+        <div class="skeleton skeleton-subtitle"></div>
+        <div class="skeleton skeleton-line"></div>
+        <div class="skeleton skeleton-line short"></div>
+      </div>
+    </div>
+  </div>
 
-  <!-- CARDS GRID -->
-  <div class="dept-grid">
+  <div class="load-error" *ngIf="!isLoading && loadError">
+    <p>{{ loadError }}</p>
+    <button class="btn-retry" (click)="load()">Reessayer</button>
+  </div>
 
+  <div class="dept-grid" *ngIf="!loadError && departments.length > 0">
     <div class="dept-card" *ngFor="let d of departments">
+      <div class="dept-photo" (click)="toggleDepartmentDetails(d)">
+        <ng-container *ngIf="d.photo; else noPhoto">
+          <img
+            [src]="d.photo"
+            [alt]="d.nom"
+            [class.is-loaded]="d.imageLoaded"
+            (load)="onImageLoad(d)"
+            (error)="onImageLoad(d)"
+          />
+        </ng-container>
+        <ng-template #noPhoto>
+          <div class="dept-photo-placeholder">
+            <span>DEP</span>
+          </div>
+        </ng-template>
 
-      <!-- PHOTO -->
-      <div class="dept-photo">
-        <img [src]="d.photo || 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=400'"
-             [alt]="d.nom" />
-        <button class="menu-btn" (click)="toggleMenu(d)">⋮</button>
+        <button class="menu-btn" (click)="$event.stopPropagation(); toggleMenu(d)">⋮</button>
 
-        <!-- DROPDOWN MENU -->
         <div class="dropdown" *ngIf="d.showMenu">
-          <button (click)="startEdit(d)">✏️ Modifier</button>
-          <button class="danger" (click)="delete(d.id)">🗑️ Supprimer</button>
+          <button (click)="startEdit(d)">Modifier</button>
+          <button class="danger" (click)="delete(d.id)">Supprimer</button>
         </div>
       </div>
 
-      <!-- INFO -->
-      <div class="dept-info">
-
+      <div class="dept-info" (click)="toggleDepartmentDetails(d)">
         <div class="dept-header">
           <div>
             <h3>{{ d.nom }}</h3>
             <p class="ville">{{ d.ville }}</p>
           </div>
-          <span class="price-badge">{{ d.total_price || 0 | number }}€</span>
         </div>
 
-        <div class="dept-stats">
-          <span class="stat">{{ d.apartments?.length || 0 }} appartements</span>
-          <span class="status-badge actif">Actif</span>
+        <div class="dept-stats one-col">
+          <span class="stat">Code postal: {{ d.code_postal || '-' }}</span>
         </div>
 
-        <div class="dept-stats">
-          <span class="stat">{{ d.tenants || 0 }} locataires</span>
+        <div class="dept-stats one-col">
+          <span class="stat">Adresse: {{ d.address || '-' }}</span>
         </div>
-
       </div>
 
+      <div class="dept-apartments" *ngIf="selectedDepartmentId === d.id">
+        <h4>Appartements du departement</h4>
+
+        <div class="dept-apt-empty" *ngIf="departmentApartments(d.id).length === 0">
+          Aucun appartement pour ce departement.
+        </div>
+
+        <div class="dept-apt-list" *ngIf="departmentApartments(d.id).length > 0">
+          <div class="dept-apt-item" *ngFor="let a of departmentApartments(d.id)">
+            <div>
+              <strong>{{ a.nom }}</strong>
+              <div class="dept-apt-meta">Etage: {{ a.etage || 0 }} | Prix: {{ a.price || 0 }} EUR</div>
+            </div>
+            <button class="btn-delete-apt" (click)="deleteApartment(a.id)">Supprimer</button>
+          </div>
+        </div>
+      </div>
     </div>
-
   </div>
 
-  <!-- EMPTY STATE -->
-  <div class="empty" *ngIf="departments.length === 0">
-    <p>Aucun département pour le moment.</p>
+  <div class="empty" *ngIf="!isLoading && !loadError && departments.length === 0">
+    <p>Aucun departement pour le moment.</p>
   </div>
 
-  <!-- EDIT MODAL -->
   <div class="modal-overlay" *ngIf="editingId !== null" (click)="cancelEdit()">
     <div class="modal" (click)="$event.stopPropagation()">
-
-      <h3>Modifier le département</h3>
+      <h3>Modifier le departement</h3>
 
       <div class="field">
         <label>Nom</label>
@@ -73,24 +105,68 @@
         <label>Adresse</label>
         <input [(ngModel)]="editingAddress" />
       </div>
+      <div class="field">
+        <label>Image</label>
+        <input type="file" accept="image/*" (change)="onSelectDepartmentPhoto($event, true)" />
+        <small *ngIf="editingPhoto">Image chargee</small>
+      </div>
+
+      <div class="modal-section">
+        <h4>Ajouter un appartement a ce departement</h4>
+
+        <div class="field">
+          <label>Nom / Numero</label>
+          <input [(ngModel)]="apartmentNom" placeholder="A101" />
+        </div>
+
+        <div class="fields-row">
+          <div class="field">
+            <label>Etage</label>
+            <input type="number" [(ngModel)]="apartmentEtage" />
+          </div>
+          <div class="field">
+            <label>Prix</label>
+            <input type="number" [(ngModel)]="apartmentPrice" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Description</label>
+          <input [(ngModel)]="apartmentDescription" placeholder="2 chambres" />
+        </div>
+        <div class="field">
+          <label>Image appartement</label>
+          <input type="file" accept="image/*" (change)="onSelectApartmentPhoto($event)" />
+          <small *ngIf="apartmentPhoto">Image chargee</small>
+        </div>
+
+        <button class="btn-save full" (click)="addApartmentToEditingDepartment()">Ajouter appartement</button>
+
+        <div class="edit-apt-list">
+          <div class="dept-apt-item" *ngFor="let a of departmentApartments(editingId)">
+            <div>
+              <strong>{{ a.nom }}</strong>
+              <div class="dept-apt-meta">Etage: {{ a.etage || 0 }} | Prix: {{ a.price || 0 }} EUR</div>
+            </div>
+            <button class="btn-delete-apt" (click)="deleteApartment(a.id)">Supprimer</button>
+          </div>
+        </div>
+      </div>
 
       <div class="modal-actions">
         <button class="btn-cancel" (click)="cancelEdit()">Annuler</button>
         <button class="btn-save" (click)="saveEdit()">Enregistrer</button>
       </div>
-
     </div>
   </div>
 
-  <!-- ADD MODAL -->
   <div class="modal-overlay" *ngIf="showAddModal" (click)="showAddModal = false">
     <div class="modal" (click)="$event.stopPropagation()">
-
-      <h3>Nouveau département</h3>
+      <h3>Nouveau departement</h3>
 
       <div class="field">
         <label>Nom</label>
-        <input [(ngModel)]="nom" placeholder="Résidence Les Oliviers" />
+        <input [(ngModel)]="nom" placeholder="Residence Les Oliviers" />
       </div>
       <div class="field">
         <label>Ville</label>
@@ -104,16 +180,19 @@
         <label>Adresse</label>
         <input [(ngModel)]="address" placeholder="12 rue de la Paix" />
       </div>
+      <div class="field">
+        <label>Image</label>
+        <input type="file" accept="image/*" (change)="onSelectDepartmentPhoto($event)" />
+        <small *ngIf="photo">Image chargee</small>
+      </div>
 
       <div class="modal-actions">
         <button class="btn-cancel" (click)="showAddModal = false">Annuler</button>
-        <button class="btn-save" (click)="add()">Ajouter</button>
+        <button class="btn-save" (click)="add(false)">Ajouter</button>
+        <button class="btn-save" (click)="add(true)">Ajouter + Apparts</button>
       </div>
-
     </div>
   </div>
 
-  <!-- FAB -->
   <button class="fab" *ngIf="isOwner" (click)="showAddModal = true">+</button>
-
 </div>

@@ -1,0 +1,41 @@
+<!-- landing.html -->
+<div class="landing-page">
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+        <rect width="36" height="36" rx="8" fill="#1a2744"/>
+        <path d="M7 27V16l11-9 11 9v11H23v-7h-6v7H7z" fill="#c9a84c"/>
+      </svg>
+      <span class="brand-text">JORILINA IMMO</span>
+    </div>
+    <div class="navbar-links">
+      <a href="#">Accueil</a>
+      <a href="#">À propos</a>
+      <a href="#">Contact</a>
+    </div>
+  </nav>
+
+  <div class="navbar-divider"></div>
+
+  <!-- HERO — centered, matches design exactly -->
+  <section class="hero">
+    <h1 class="hero-title">
+      La gestion immobilière<br/>simplifiée
+    </h1>
+    <p class="hero-subtitle">
+      Une plateforme moderne pour gérer vos biens immobiliers, suivre vos<br/>
+      contrats et faciliter les paiements entre propriétaires et locataires.
+    </p>
+    <div class="hero-cta">
+      <a routerLink="/login" [queryParams]="{role: 'proprietaire'}" class="cta-primary">
+        Je suis Propriétaire
+      </a>
+      <a routerLink="/login" [queryParams]="{role: 'locataire'}" class="cta-secondary">
+        Je suis Locataire
+      </a>
+    </div>
+  </section>
+
+</div>

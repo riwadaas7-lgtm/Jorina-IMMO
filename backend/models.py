@@ -11,6 +11,7 @@ class Department(Base):
     ville = Column(String)
     code_postal = Column(String)
     address = Column(String)
+    photo = Column(String)
 
     apartments = relationship(
         "Apartment",
@@ -48,6 +49,7 @@ class User(Base):
     cin = Column(String)
     password = Column(String)               # ✅ added
     role = Column(String)                   # locataire / proprietaire
+    tenant_code = Column(String, unique=True, nullable=True)
     apartment_id = Column(Integer, ForeignKey("apartments.id"), nullable=True)
 
     apartment = relationship("Apartment", back_populates="tenants")
@@ -63,6 +65,7 @@ class Contract(Base):
     status = Column(String)                 # actif / termine / resilie
     caution = Column(Integer)
     montant_total = Column(Integer)
+    contract_file = Column(String, nullable=True)
 
     tenant_id = Column(Integer, ForeignKey("users.id"))
     apartment_id = Column(Integer, ForeignKey("apartments.id"))
