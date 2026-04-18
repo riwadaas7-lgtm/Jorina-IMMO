@@ -1,0 +1,96 @@
+.page-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--navy);
+  margin-bottom: 24px;
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 24px;
+}
+.tab {
+  background: none; border: none;
+  padding: 12px 24px;
+  font-size: 14px; font-weight: 500;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+}
+.tab:hover { color: var(--navy); }
+.tab.active { color: var(--navy); font-weight: 700; border-bottom-color: var(--gold); }
+
+.factures-list { display: flex; flex-direction: column; gap: 12px; }
+
+.facture-row {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 18px 22px;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: transform 0.15s;
+}
+.facture-row:hover { transform: translateX(4px); }
+
+.facture-icon-box {
+  width: 48px; height: 48px;
+  background: var(--bg);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+
+.facture-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.facture-type {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.facture-date {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.facture-montant {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--navy);
+  min-width: 80px;
+  text-align: right;
+}
+
+.btn-payer {
+  background: var(--gold);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 22px;
+  font-size: 14px;
+  font-weight: 700;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+.btn-payer:hover { background: var(--gold-hover); }
+
+.badge-payee {
+  background: #dcfce7;
+  color: #16a34a;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+.empty { text-align: center; padding: 60px; color: var(--muted); }

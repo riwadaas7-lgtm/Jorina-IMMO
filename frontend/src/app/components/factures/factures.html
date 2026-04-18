@@ -1,86 +1,98 @@
-<div class="container mt-4">
+<div class="page">
 
-  <h3 class="fw-bold mb-4">Factures</h3>
-
-  <!-- 🔵 ADD -->
-  <div *ngIf="isOwner" class="card border-0 shadow-sm p-4 mb-4 rounded-4">
-
-    <h5 class="mb-3">New Facture</h5>
-
-    <div class="row g-3">
-
-      <div class="col-md-3">
-        <input class="form-control"
-               [(ngModel)]="type"
-               placeholder="Type">
-      </div>
-
-      <div class="col-md-3">
-        <input class="form-control"
-               type="number"
-               [(ngModel)]="montant"
-               placeholder="Amount">
-      </div>
-
-      <div class="col-md-3">
-        <select class="form-select" [(ngModel)]="apartmentId">
-          <option [ngValue]="null">Apartment</option>
-          <option *ngFor="let a of apartments" [ngValue]="a.id">
-            {{ a.nom }}
-          </option>
-        </select>
-      </div>
-
-      <div class="col-md-3">
-        <button class="btn btn-primary w-100" (click)="add()">
-          Add
-        </button>
-      </div>
-
-    </div>
-
+  <div class="page-header">
+    <h2 class="page-title">Gestion des Factures</h2>
+    <button class="btn-export">⬇ Exporter</button>
   </div>
 
-  <!-- 🔥 TABLE -->
-  <div class="card border-0 shadow-sm rounded-4">
-
-    <div class="card-body">
-
-      <h5 class="mb-3">Factures List</h5>
-
-      <table class="table align-middle">
-
-        <thead class="table-light">
-          <tr>
-            <th>#</th>
-            <th>Type</th>
-            <th>Amount</th>
-            <th>Apartment</th>
-            <th *ngIf="isOwner">Actions</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <tr *ngFor="let f of factures">
-            <td>{{ f.id }}</td>
-            <td>{{ f.type }}</td>
-            <td>{{ f.montant }} DT</td>
-            <td>{{ getApartmentName(f.apartment_id) }}</td>
-
-            <td *ngIf="isOwner">
-              <button class="btn btn-danger btn-sm"
-                      (click)="delete(f.id)">
-                Delete
-              </button>
-            </td>
-
-          </tr>
-        </tbody>
-
-      </table>
-
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <span class="stat-label">Total</span>
+      <span class="stat-value">{{ factures.length }}</span>
     </div>
+    <div class="stat-card">
+      <span class="stat-label">En attente</span>
+      <span class="stat-value orange">{{ countByStatus('en_attente') }}</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Payées</span>
+      <span class="stat-value green">{{ countByStatus('payee') }}</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">En retard</span>
+      <span class="stat-value red">{{ countByStatus('en_retard') }}</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Montant total</span>
+      <span class="stat-value gold">{{ totalMontant() | number }}DT</span>
+    </div>
+  </div>
 
+  <!-- SEARCH -->
+  <div class="search-filter">
+    <div class="search-inner">
+      <span>🔍</span>
+      <input type="text"
+             placeholder="Rechercher par locataire ou appartement..."
+             [(ngModel)]="searchTerm" />
+    </div>
+    <button class="btn-filter">⚙ Filtrer</button>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab" [class.active]="activeTab==='toutes'"
+            (click)="activeTab='toutes'">Toutes</button>
+    <button class="tab" [class.active]="activeTab==='en_attente'"
+            (click)="activeTab='en_attente'">En attente</button>
+    <button class="tab" [class.active]="activeTab==='payee'"
+            (click)="activeTab='payee'">Payées</button>
+    <button class="tab" [class.active]="activeTab==='en_retard'"
+            (click)="activeTab='en_retard'">En retard</button>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrapper">
+    <table class="factures-table">
+      <thead>
+        <tr>
+          <th>Locataire</th>
+          <th>Appartement</th>
+          <th>Type</th>
+          <th>Date</th>
+          <th>Montant</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let f of filtered()">
+          <td class="td-name">{{ f.tenant_name || '—' }}</td>
+          <td class="td-apt">{{ f.apartment_name || '—' }}</td>
+          <td>
+            <span class="type-badge">{{ typeIcon(f.type) }} {{ f.type }}</span>
+          </td>
+          <td>{{ f.date_facture }}</td>
+          <td class="td-montant">{{ f.montant | number }}€</td>
+          <td>
+            <span class="status-badge" [ngClass]="f.status">
+              {{ statusLabel(f.status) }}
+            </span>
+          </td>
+          <td>
+            <div class="row-actions">
+              <button class="btn-icon" title="Voir">👁</button>
+              <button class="btn-icon del" (click)="delete(f.id)" title="Supprimer">🗑️</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="empty" *ngIf="filtered().length === 0">
+      Aucune facture trouvée.
+    </div>
   </div>
 
 </div>

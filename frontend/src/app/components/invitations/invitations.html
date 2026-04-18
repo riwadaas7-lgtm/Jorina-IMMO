@@ -1,0 +1,74 @@
+<div class="page">
+
+  <h2 class="page-title">Invitations</h2>
+
+  <div class="inv-grid">
+
+    <!-- CARTE : Générer un code -->
+    <div class="inv-card">
+      <h3>Inviter un locataire</h3>
+      <p class="inv-sub">
+        Générez un code unique et partagez-le avec votre locataire.
+        Il devra l'entrer dans son espace pour rejoindre l'appartement.
+      </p>
+
+      <div class="code-label">Code d'invitation actuel</div>
+
+      <div class="code-box">
+        <span class="code-text">{{ currentCode }}</span>
+        <button class="btn-copy" (click)="copyCode()">
+          📋 Copier le code
+        </button>
+      </div>
+
+      <div class="copy-success" *ngIf="copied">✅ Code copié !</div>
+
+      <!-- Bouton pour générer un nouveau code -->
+      <button class="btn-generate" (click)="generateCode()">
+        🔄 Générer un nouveau code
+      </button>
+
+      <!-- Choisir à quel appartement associer ce code -->
+      <div class="field">
+        <label>Associer à un appartement</label>
+        <select [(ngModel)]="selectedApartment">
+          <option value="">-- Choisir un appartement --</option>
+          <option *ngFor="let a of apartments" [value]="a.id">
+            {{ a.nom }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Sauvegarder le code dans le backend -->
+      <button class="btn-save-code"
+              [disabled]="!selectedApartment"
+              (click)="saveCode()">
+        💾 Enregistrer le code
+      </button>
+
+      <div class="save-success" *ngIf="saved">
+        ✅ Code enregistré ! Le locataire peut maintenant rejoindre.
+      </div>
+    </div>
+
+    <!-- CARTE : Historique des codes -->
+    <div class="inv-card">
+      <h3>Codes générés récemment</h3>
+
+      <div class="history-list" *ngIf="history.length > 0">
+        <div class="history-item" *ngFor="let h of history">
+          <span class="history-code">{{ h.code }}</span>
+          <span class="history-apt">{{ h.apt }}</span>
+          <span class="history-date">{{ h.date }}</span>
+        </div>
+      </div>
+
+      <div class="empty-history" *ngIf="history.length === 0">
+        <p>🔑 Aucun code généré pour l'instant.</p>
+        <p>Générez un code à gauche et associez-le à un appartement.</p>
+      </div>
+    </div>
+
+  </div>
+
+</div>

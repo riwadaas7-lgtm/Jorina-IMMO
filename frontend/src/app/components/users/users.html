@@ -13,7 +13,7 @@
 
   <div class="search-filter">
     <div class="search-inner">
-      <span>??</span>
+      <span>🔍</span>
       <input type="text" placeholder="Rechercher par nom, email ou appartement..." [(ngModel)]="searchTerm" />
     </div>
     <button class="btn-filter">Filtrer</button>
@@ -40,10 +40,10 @@
       </div>
 
       <div class="card-details">
-        <div class="detail-row"><span class="detail-icon">??</span><span>{{ u.apartment_nom || 'Appartement non assigne' }}</span></div>
-        <div class="detail-row"><span class="detail-icon">??</span><span>{{ u.ville || '-' }}</span></div>
-        <div class="detail-row"><span class="detail-icon">??</span><span>{{ u.email }}</span></div>
-        <div class="detail-row"><span class="detail-icon">??</span><span>{{ u.telephone || '-' }}</span></div>
+        <div class="detail-row"><span class="detail-icon">🔍</span><span>{{ u.apartment_nom || 'Appartement non assigne' }}</span></div>
+        <div class="detail-row"><span class="detail-icon">📍</span><span>{{ u.ville || '-' }}</span></div>
+        <div class="detail-row"><span class="detail-icon">✉️</span><span>{{ u.email }}</span></div>
+        <div class="detail-row"><span class="detail-icon">📞</span><span>{{ u.telephone || '-' }}</span></div>
 
         <div class="tenant-code-wrap">
           <div class="tenant-code-text">
@@ -56,11 +56,11 @@
       <div class="card-footer">
         <div>
           <p class="loyer-label">Loyer mensuel</p>
-          <p class="loyer-value">{{ u.loyer || 0 | number }} EUR</p>
+          <p class="loyer-value">{{ u.loyer || 0 | number }} DT</p>
         </div>
         <div class="contact-actions">
-          <button class="contact-btn" title="Envoyer un email">??</button>
-          <button class="contact-btn" title="Appeler">??</button>
+          <button class="contact-btn" title="Envoyer un email">✉️</button>
+          <button class="contact-btn" title="Appeler">📞</button>
         </div>
       </div>
     </div>

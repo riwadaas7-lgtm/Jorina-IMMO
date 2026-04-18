@@ -49,32 +49,45 @@
         </a>
       </ng-container>
 
-      <ng-container *ngIf="isLocataire">
-        <a routerLink="/my-apartment" routerLinkActive="active" class="nav-item">
-          <span class="nav-icon">&#127968;</span>
-          <span>Mon Appartement</span>
-        </a>
+      <!-- LOCATAIRE LINKS -->
+<ng-container *ngIf="isLocataire">
 
-        <a routerLink="/my-contract" routerLinkActive="active" class="nav-item">
-          <span class="nav-icon">&#128196;</span>
-          <span>Mon Contrat</span>
-        </a>
+  <a routerLink="/my-apartment"
+     routerLinkActive="active"
+     class="nav-item">
+    <span class="nav-icon">🏠</span>
+    <span>Mon Appartement</span>
+  </a>
 
-        <a routerLink="/my-factures" routerLinkActive="active" class="nav-item">
-          <span class="nav-icon">&#128203;</span>
-          <span>Mes Factures</span>
-        </a>
+  <a routerLink="/my-contract"
+     routerLinkActive="active"
+     class="nav-item">
+    <span class="nav-icon">📄</span>
+    <span>Mon Contrat</span>
+  </a>
 
-        <a routerLink="/my-payments" routerLinkActive="active" class="nav-item">
-          <span class="nav-icon">&#128179;</span>
-          <span>Mes Paiements</span>
-        </a>
+  <a routerLink="/my-factures"
+     routerLinkActive="active"
+     class="nav-item">
+    <span class="nav-icon">🧾</span>
+    <span>Mes Factures</span>
+  </a>
 
-        <a routerLink="/notifications" routerLinkActive="active" class="nav-item">
-          <span class="nav-icon">&#128276;</span>
-          <span>Notifications</span>
-        </a>
-      </ng-container>
+  <a routerLink="/my-payments"
+     routerLinkActive="active"
+     class="nav-item">
+    <span class="nav-icon">💳</span>
+    <span>Mes Paiements</span>
+  </a>
+
+  <a routerLink="/my-notifications"
+     routerLinkActive="active"
+     class="nav-item">
+    <span class="nav-icon">🔔</span>
+    <span>Notifications</span>
+  </a>
+
+</ng-container>
     </nav>
 
     <button class="logout-btn" (click)="logout()">&#128682; Deconnexion</button>
@@ -87,10 +100,10 @@
         <input type="text" placeholder="Rechercher..." />
       </div>
       <div class="topbar-right">
-        <button class="notif-btn">
-          &#128276;
-          <span class="notif-badge">3</span>
-        </button>
+        <button class="notif-btn" (click)="goToNotifications()">
+  🔔
+  <span class="notif-badge">2</span>
+</button>
         <div class="avatar" (click)="toggleAccountMenu()">
           {{ user?.nom?.charAt(0) || 'U' }}
         </div>

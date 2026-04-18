@@ -1,45 +1,50 @@
 <div class="page" *ngIf="!loading">
 
-  <h2 class="page-title">Mon Espace Locataire</h2>
+  <!-- HEADER -->
+  <div class="page-header-row">
+    <h2 class="page-title">Mon Espace Locataire</h2>
+    <button class="btn-join-classroom"
+            (click)="showJoinModal = true"
+            *ngIf="!apartment">
+      + Rejoindre un appartement
+    </button>
+  </div>
 
-  <!-- NO APARTMENT -->
+  <!-- ══ PAS D'APPARTEMENT ══ -->
   <div class="empty-state" *ngIf="!apartment">
     <div class="empty-icon">🏠</div>
     <h3>Vous n'avez pas encore d'appartement</h3>
-    <p>Contactez votre propriétaire pour obtenir un code d'accès.</p>
+    <p>Cliquez sur "Rejoindre un appartement" et entrez le code fourni par votre propriétaire.</p>
   </div>
 
-  <!-- APARTMENT HERO -->
+  <!-- ══ HERO APPARTEMENT ══ -->
   <div class="apt-hero" *ngIf="apartment">
     <img [src]="apartment.photo || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200'"
-         [alt]="apartment.nom" class="hero-img" />
-
+         [alt]="apartment.nom"
+         class="hero-img" />
     <div class="hero-overlay">
       <div class="hero-content">
         <h2>Mon Appartement</h2>
-        <p class="hero-address">{{ apartment.description || '12 Rue des Oliviers, 75001 Paris' }}</p>
-        <p class="hero-owner">Propriétaire: M. Jean Dupont</p>
+        <p class="hero-address">{{ apartment.description || 'Adresse non renseignée' }}</p>
+        <p class="hero-owner">Appartement: {{ apartment.nom }}</p>
       </div>
       <div class="price-badge">{{ apartment.price | number }}€/mois</div>
     </div>
   </div>
 
-  <!-- SUMMARY CARDS -->
+  <!-- ══ 3 CARTES RÉSUMÉ ══ -->
   <div class="summary-grid" *ngIf="apartment">
 
-    <!-- CONTRACT -->
     <div class="summary-card">
       <div class="summary-icon green">📋</div>
       <div class="summary-info">
         <span class="summary-label">Mon Contrat</span>
         <span class="summary-value">{{ contract ? contract.status : 'Aucun' }}</span>
-        <span class="summary-sub" *ngIf="contract">
-          Expire le {{ contract.date_fin }}
-        </span>
+        <span class="summary-sub" *ngIf="contract">Expire le {{ contract.date_fin }}</span>
+        <span class="summary-sub" *ngIf="!contract">Pas de contrat actif</span>
       </div>
     </div>
 
-    <!-- FACTURES -->
     <div class="summary-card">
       <div class="summary-icon gold">🧾</div>
       <div class="summary-info">
@@ -49,13 +54,12 @@
       </div>
     </div>
 
-    <!-- PAIEMENTS -->
     <div class="summary-card">
       <div class="summary-icon navy">💳</div>
       <div class="summary-info">
         <span class="summary-label">Mes Paiements</span>
         <span class="summary-value">{{ totalPaiements | number }}€</span>
-        <span class="summary-sub">Dernier paiement</span>
+        <span class="summary-sub">Total payé</span>
       </div>
     </div>
 
@@ -66,5 +70,40 @@
 <!-- LOADING -->
 <div class="loading" *ngIf="loading">
   <div class="spinner"></div>
-  <p>Chargement...</p>
+</div>
+
+<!-- ══ MODAL REJOINDRE ══ -->
+<div class="modal-overlay" *ngIf="showJoinModal" (click)="showJoinModal = false">
+  <div class="modal join-modal" (click)="$event.stopPropagation()">
+
+    <div class="join-modal-icon">🔑</div>
+    <h3>Rejoindre un appartement</h3>
+    <p class="join-sub">Entrez le code fourni par votre propriétaire</p>
+
+    <input type="text"
+           [(ngModel)]="joinCode"
+           placeholder="APT-XXXX"
+           class="join-input"
+           (keyup.enter)="joinApartment()" />
+
+    <!-- Message succès ou erreur -->
+    <div class="join-msg success" *ngIf="joinMsg && joinMsg.startsWith('✅')">
+      {{ joinMsg }}
+    </div>
+    <div class="join-msg error" *ngIf="joinMsg && joinMsg.startsWith('❌')">
+      {{ joinMsg }}
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="showJoinModal = false; joinCode = ''; joinMsg = ''">
+        Annuler
+      </button>
+      <button class="btn-save"
+              (click)="joinApartment()"
+              [disabled]="joinLoading || !joinCode.trim()">
+        {{ joinLoading ? 'Vérification...' : 'Rejoindre' }}
+      </button>
+    </div>
+
+  </div>
 </div>

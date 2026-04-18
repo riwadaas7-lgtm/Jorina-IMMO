@@ -139,3 +139,124 @@
   animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+.page-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+/* Bouton style Google Classroom */
+.btn-join-classroom {
+  background: var(--navy);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 22px;
+  font-size: 15px;
+  font-weight: 700;
+  transition: opacity 0.2s;
+}
+.btn-join-classroom:hover { opacity: 0.85; }
+
+/* Modal rejoindre */
+.join-modal {
+  text-align: center;
+  max-width: 400px !important;
+}
+
+.join-modal-icon { font-size: 48px; margin-bottom: 8px; }
+
+.join-sub {
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.join-input {
+  padding: 14px !important;
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  letter-spacing: 4px;
+  text-align: center;
+  width: 100%;
+  border: 2px solid var(--border) !important;
+  border-radius: 12px !important;
+  outline: none;
+}
+.join-input:focus { border-color: var(--navy) !important; }
+
+.join-msg {
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--bg);
+  color: var(--navy);
+}
+.page-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+/* Bouton style Google Classroom */
+.btn-join-classroom {
+  background: var(--navy);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 13px 22px;
+  font-size: 15px;
+  font-weight: 700;
+  transition: opacity 0.2s;
+}
+.btn-join-classroom:hover { opacity: 0.85; }
+
+/* MODAL REJOINDRE */
+.join-modal {
+  text-align: center;
+  max-width: 400px !important;
+  gap: 14px !important;
+}
+
+.join-modal-icon { font-size: 52px; }
+
+.join-modal h3 {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--navy);
+}
+
+.join-sub {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* Champ de saisie du code */
+.join-input {
+  width: 100%;
+  padding: 16px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 5px;
+  text-align: center;
+  text-transform: uppercase;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  outline: none;
+  background: var(--bg);
+  transition: border 0.2s;
+}
+.join-input:focus { border-color: var(--navy); background: white; }
+
+/* Messages */
+.join-msg {
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.join-msg.success { background: #f0fdf4; color: #16a34a; }
+.join-msg.error   { background: #fff1f2; color: #dc2626; }

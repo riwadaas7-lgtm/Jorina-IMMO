@@ -1,0 +1,51 @@
+<div class="page">
+
+  <h2 class="page-title">Mes Factures</h2>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab" [class.active]="activeTab==='toutes'"
+            (click)="activeTab='toutes'">Toutes</button>
+    <button class="tab" [class.active]="activeTab==='en_attente'"
+            (click)="activeTab='en_attente'">En attente</button>
+    <button class="tab" [class.active]="activeTab==='payee'"
+            (click)="activeTab='payee'">Payées</button>
+    <button class="tab" [class.active]="activeTab==='en_retard'"
+            (click)="activeTab='en_retard'">En retard</button>
+  </div>
+
+  <!-- FACTURES LIST -->
+  <div class="factures-list">
+
+    <div class="facture-row" *ngFor="let f of filtered()">
+
+      <div class="facture-icon-box">
+        <span>{{ typeIcon(f.type) }}</span>
+      </div>
+
+      <div class="facture-info">
+        <span class="facture-type">{{ f.type | titlecase }}</span>
+        <span class="facture-date">Date: {{ f.date_facture }}</span>
+      </div>
+
+      <span class="facture-montant">{{ f.montant | number }}€</span>
+
+      <button class="btn-payer"
+              *ngIf="f.status !== 'payee'"
+              (click)="payer(f)">
+        Payer
+      </button>
+
+      <span class="badge-payee" *ngIf="f.status === 'payee'">
+        ✓ Payée
+      </span>
+
+    </div>
+
+  </div>
+
+  <div class="empty" *ngIf="filtered().length === 0">
+    Aucune facture trouvée.
+  </div>
+
+</div>

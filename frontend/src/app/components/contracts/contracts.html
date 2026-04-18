@@ -25,7 +25,7 @@
 
   <div class="search-filter">
     <div class="search-inner">
-      <span>??</span>
+      <span>🔍</span>
       <input type="text" placeholder="Rechercher par locataire ou appartement..." [(ngModel)]="searchTerm" />
     </div>
     <button class="btn-filter">Filtrer</button>
@@ -42,7 +42,7 @@
     <div class="contract-card" *ngFor="let c of filtered()">
       <div class="contract-top">
         <div class="contract-left">
-          <div class="doc-icon">??</div>
+          <div class="doc-icon">📄</div>
           <div>
             <h3 class="tenant-name">{{ c.tenant_name || ('Locataire #' + c.tenant_id) }}</h3>
             <p class="apt-name">{{ c.apartment_name || ('Appartement #' + c.apartment_id) }}</p>
@@ -62,11 +62,11 @@
         </div>
         <div class="info-col">
           <span class="info-label">Loyer</span>
-          <span class="info-value gold">{{ c.montant_total | number }} EUR</span>
+          <span class="info-value gold">{{ c.montant_total | number }} DT</span>
         </div>
         <div class="info-col">
           <span class="info-label">Caution</span>
-          <span class="info-value">{{ c.caution | number }} EUR</span>
+          <span class="info-value">{{ c.caution | number }} DT</span>
         </div>
       </div>
 
@@ -151,8 +151,8 @@
         <div class="view-field"><span class="view-label">Appartement</span><span class="view-val">{{ viewingContract.apartment_name || '-' }}</span></div>
         <div class="view-field"><span class="view-label">Date debut</span><span class="view-val">{{ viewingContract.date_debut }}</span></div>
         <div class="view-field"><span class="view-label">Date fin</span><span class="view-val">{{ viewingContract.date_fin }}</span></div>
-        <div class="view-field"><span class="view-label">Loyer</span><span class="view-val gold">{{ viewingContract.montant_total | number }} EUR</span></div>
-        <div class="view-field"><span class="view-label">Caution</span><span class="view-val">{{ viewingContract.caution | number }} EUR</span></div>
+        <div class="view-field"><span class="view-label">Loyer</span><span class="view-val gold">{{ viewingContract.montant_total | number }} DT</span></div>
+        <div class="view-field"><span class="view-label">Caution</span><span class="view-val">{{ viewingContract.caution | number }} DT</span></div>
         <div class="view-field" *ngIf="viewingContract.contract_file">
           <span class="view-label">Fichier contrat</span>
           <a class="view-val gold" [href]="viewingContract.contract_file" target="_blank">Ouvrir l'image</a>

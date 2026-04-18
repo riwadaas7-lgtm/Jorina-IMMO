@@ -1,0 +1,42 @@
+<div class="page">
+
+  <div class="page-header">
+    <div class="title-row">
+      <h2 class="page-title">Notifications</h2>
+      <span class="new-badge" *ngIf="unreadCount() > 0">
+        {{ unreadCount() }} nouveaux
+      </span>
+    </div>
+    <button class="btn-mark-all" (click)="markAllRead()">
+      ✓ Tout marquer comme lu
+    </button>
+  </div>
+
+  <div class="notif-list">
+
+    <div class="notif-item"
+         *ngFor="let n of notifications"
+         [class.unread]="!n.read"
+         [class]="'notif-item ' + n.type + (n.read ? '' : ' unread')">
+
+      <div class="notif-icon" [ngClass]="n.type">
+        {{ typeIcon(n.type) }}
+      </div>
+
+      <div class="notif-body">
+        <h4 class="notif-title">{{ n.title }}</h4>
+        <p class="notif-desc">{{ n.description }}</p>
+        <span class="notif-time">🔔 {{ n.time }}</span>
+      </div>
+
+      <div class="notif-dot" *ngIf="!n.read"></div>
+
+    </div>
+
+  </div>
+
+  <div class="empty" *ngIf="notifications.length === 0">
+    Aucune notification.
+  </div>
+
+</div>

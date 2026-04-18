@@ -1,67 +1,64 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-factures',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './factures.html',
+  styleUrl: './factures.css'
 })
-export class FacturesComponent {
+export class FacturesComponent implements OnInit {
 
-  user = JSON.parse(localStorage.getItem('user')!);
-  isOwner = this.user?.role === 'proprietaire';
+  factures:   any[] = [];
+  activeTab   = 'toutes';
+  searchTerm  = '';
 
-  factures: any[] = [];
-  apartments: any[] = [];
+  constructor(private api: ApiService) {}
 
-  type = '';
-  montant: number | null = null;
-  apartmentId: number | null = null;
-
-  constructor(private api: ApiService) {
-    this.load();
-  }
+  ngOnInit() { this.load(); }
 
   load() {
-    this.api.getFactures().subscribe(res => {
-      this.factures = res;
-    });
-
-    this.api.getApartments(this.user.id).subscribe(res => {
-      this.apartments = res;
-    });
+    this.api.getFactures().subscribe(res => this.factures = res);
   }
 
-  add() {
-    if (!this.isOwner) return;
+  countByStatus(s: string) {
+    return this.factures.filter(f => f.status === s).length;
+  }
 
-    if (!this.type || !this.montant || !this.apartmentId) return;
+  totalMontant() {
+    return this.factures.reduce((sum, f) => sum + (f.montant || 0), 0);
+  }
 
-    this.api.addFacture({
-      type: this.type,
-      montant: this.montant,
-      apartment_id: this.apartmentId
-    }).subscribe(() => {
-      this.type = '';
-      this.montant = null;
-      this.apartmentId = null;
-      this.load();
+  statusLabel(s: string) {
+    const map: any = {
+      en_attente: 'En attente',
+      payee:      'Payée',
+      en_retard:  'En retard'
+    };
+    return map[s] || s;
+  }
+
+  typeIcon(t: string) {
+    const map: any = { loyer: '🏠', electricite: '💡', eau: '💧', autre: '📄' };
+    return map[t] || '📄';
+  }
+
+  filtered() {
+    return this.factures.filter(f => {
+      const matchTab    = this.activeTab === 'toutes' || f.status === this.activeTab;
+      const term        = this.searchTerm.toLowerCase();
+      const matchSearch = !term ||
+        f.tenant_name?.toLowerCase().includes(term) ||
+        f.apartment_name?.toLowerCase().includes(term);
+      return matchTab && matchSearch;
     });
   }
 
   delete(id: number) {
-    if (!this.isOwner) return;
-
-    this.api.deleteFacture(id).subscribe(() => {
-      this.load();
-    });
-  }
-
-  getApartmentName(id: number) {
-    const a = this.apartments.find(x => x.id === id);
-    return a ? a.nom : '';
+    if (!confirm('Supprimer cette facture ?')) return;
+    this.api.deleteFacture(id).subscribe(() => this.load());
   }
 }

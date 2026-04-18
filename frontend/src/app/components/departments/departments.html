@@ -72,7 +72,7 @@
           <div class="dept-apt-item" *ngFor="let a of departmentApartments(d.id)">
             <div>
               <strong>{{ a.nom }}</strong>
-              <div class="dept-apt-meta">Etage: {{ a.etage || 0 }} | Prix: {{ a.price || 0 }} EUR</div>
+              <div class="dept-apt-meta">Etage: {{ a.etage || 0 }} | Prix: {{ a.price || 0 }} DT</div>
             </div>
             <button class="btn-delete-apt" (click)="deleteApartment(a.id)">Supprimer</button>
           </div>
@@ -188,8 +188,7 @@
 
       <div class="modal-actions">
         <button class="btn-cancel" (click)="showAddModal = false">Annuler</button>
-        <button class="btn-save" (click)="add(false)">Ajouter</button>
-        <button class="btn-save" (click)="add(true)">Ajouter + Apparts</button>
+        <button class="btn-save" (click)="add()">Ajouter</button>
       </div>
     </div>
   </div>

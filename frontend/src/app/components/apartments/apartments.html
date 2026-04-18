@@ -26,7 +26,7 @@
 
   <div class="search-filter">
     <div class="search-inner">
-      <span>??</span>
+      <span>🔍</span>
       <input
         type="text"
         placeholder="Rechercher par nom, departement, ville ou locataire..."
@@ -49,7 +49,7 @@
         <img [src]="a.photo" [alt]="a.nom" />
       </div>
       <ng-template #defaultIcon>
-        <div class="apt-icon">??</div>
+        <div class="apt-icon"><span>🔍</span></div>
       </ng-template>
 
       <div class="apt-body">
@@ -61,10 +61,10 @@
         </div>
         <p class="apt-sub">{{ a.etage ? a.etage + 'eme etage' : '' }} {{ a.description }}</p>
         <div class="apt-footer">
-          <span class="apt-price">{{ a.price | number }}EUR/mois</span>
+          <span class="apt-price">{{ a.price | number }}DT/mois</span>
           <div class="apt-actions">
-            <button class="btn-icon edit" (click)="startEdit(a)" title="Modifier">??</button>
-            <button class="btn-icon del" (click)="delete(a.id)" title="Supprimer">???</button>
+            <button class="btn-icon edit" (click)="startEdit(a)" title="Modifier">✏️</button>
+            <button class="btn-icon del" (click)="delete(a.id)" title="Supprimer">🗑️</button>
           </div>
         </div>
       </div>
@@ -87,7 +87,7 @@
           <input type="number" [(ngModel)]="form.etage" placeholder="1" />
         </div>
         <div class="field">
-          <label>Prix (EUR/mois)</label>
+          <label>Prix (DT/mois)</label>
           <input type="number" [(ngModel)]="form.price" placeholder="1200" />
         </div>
       </div>
@@ -129,7 +129,7 @@
           <input type="number" [(ngModel)]="form.etage" />
         </div>
         <div class="field">
-          <label>Prix (EUR/mois)</label>
+          <label>Prix (DT/mois)</label>
           <input type="number" [(ngModel)]="form.price" />
         </div>
       </div>

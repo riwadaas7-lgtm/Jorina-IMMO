@@ -1,0 +1,84 @@
+<div class="page" *ngIf="!loading">
+
+  <h2 class="page-title">Mon Contrat</h2>
+
+  <!-- NO CONTRACT -->
+  <div class="empty-state" *ngIf="!contract">
+    <div class="empty-icon">📄</div>
+    <h3>Aucun contrat actif</h3>
+    <p>Contactez votre propriétaire.</p>
+  </div>
+
+  <ng-container *ngIf="contract">
+
+    <!-- APARTMENT INFO CARD -->
+    <div class="apt-info-card">
+      <img [src]="apartment?.photo || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=200'"
+           class="apt-thumb" [alt]="apartment?.nom" />
+      <div class="apt-details">
+        <h3>{{ apartment?.nom || 'Mon Appartement' }}</h3>
+        <p class="apt-meta">
+          <span>🏠</span>
+          <span>{{ apartment?.description || '12 Rue des Oliviers, 75001 Paris' }}</span>
+        </p>
+        <p class="apt-meta">
+          <span>👤</span>
+          <span>Propriétaire: M. Jean Dupont</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- STATUS BANNER -->
+    <div class="status-banner" [ngClass]="contract.status">
+      ✓ Contrat {{ statusLabel(contract.status) }}
+    </div>
+
+    <!-- DETAILS -->
+    <div class="details-card">
+      <h3 class="details-title">Détails du contrat</h3>
+
+      <div class="details-grid">
+        <div class="detail-box">
+          <span class="detail-label">Date de début</span>
+          <span class="detail-value">{{ contract.date_debut }}</span>
+        </div>
+        <div class="detail-box">
+          <span class="detail-label">Date de fin</span>
+          <span class="detail-value">{{ contract.date_fin }}</span>
+        </div>
+        <div class="detail-box">
+          <span class="detail-label">Loyer mensuel</span>
+          <span class="detail-value gold">{{ contract.montant_total | number }}€</span>
+        </div>
+        <div class="detail-box">
+          <span class="detail-label">Caution</span>
+          <span class="detail-value gold">{{ contract.caution | number }}€</span>
+        </div>
+      </div>
+
+      <!-- PROGRESS BAR -->
+      <div class="progress-section">
+        <div class="progress-header">
+          <span>Progression du contrat</span>
+          <span>{{ progressPercent() }}%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="progressPercent()"></div>
+        </div>
+        <div class="progress-dates">
+          <span>{{ contract.date_debut }}</span>
+          <span>{{ contract.date_fin }}</span>
+        </div>
+      </div>
+
+      <!-- DOWNLOAD -->
+      <button class="btn-download">⬇ Télécharger PDF</button>
+    </div>
+
+  </ng-container>
+
+</div>
+
+<div class="loading" *ngIf="loading">
+  <div class="spinner"></div>
+</div>

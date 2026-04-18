@@ -6,9 +6,12 @@ import { ApiService } from '../../services/api';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-login',//esm el balise html <app-login>
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
+  // CommonModule → *ngIf, *ngFor
+  // FormsModule  → [(ngModel)]
+  // RouterModule → routerLink
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
@@ -16,16 +19,15 @@ export class LoginComponent {
 
   email    = '';
   password = '';
-  role     = 'proprietaire';
+  role     = 'proprietaire'; // rôle sélectionné par défaut
+  
   errorMsg = '';
   loading  = false;
 
-  constructor(
-    private api: ApiService,
-    private auth: AuthService
-  ) {}
+  constructor(private api: ApiService, private auth: AuthService) {}
 
   login() {
+    // Vérification des champs
     if (!this.email || !this.password) {
       this.errorMsg = 'Veuillez remplir tous les champs.';
       return;
@@ -34,11 +36,12 @@ export class LoginComponent {
     this.loading  = true;
     this.errorMsg = '';
 
+    // Appel API → POST /login
     this.api.login({ email: this.email, password: this.password, role: this.role })
       .subscribe({
         next: (res: any) => {
-          this.auth.login(res);
-          this.auth.redirectAfterLogin();
+          this.auth.login(res);           // sauvegarde token + user
+          this.auth.redirectAfterLogin(); // redirige selon le rôle
         },
         error: (err) => {
           this.errorMsg = err.error?.detail || 'Erreur de connexion.';

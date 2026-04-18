@@ -1,4 +1,4 @@
-import 'zone.js';
+import 'zone.js'; // update sans refresh
 import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/app.config';
 import { App } from './app/app';

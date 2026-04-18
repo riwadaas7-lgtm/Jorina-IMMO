@@ -1,39 +1,82 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';   // ✅ nécessaire pour [(ngModel)]
 import { ApiService } from '../../services/api';
-import { RouterModule } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-my-apartment',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, FormsModule],          // ✅ FormsModule ajouté
   templateUrl: './my-apartment.html',
   styleUrl: './my-apartment.css'
 })
 export class MyApartmentComponent implements OnInit {
 
   user      = JSON.parse(localStorage.getItem('user') || '{}');
-  apartment: any = null;
-  contract:  any = null;
+  apartment: any  = null;
+  contract:  any  = null;
   factures:  any[] = [];
-  loading        = true;
+  loading         = true;
 
-  constructor(private api: ApiService) {}
+  // Modal rejoindre
+  showJoinModal = false;
+  joinCode      = '';
+  joinMsg       = '';
+  joinLoading   = false;
+
+  constructor(private api: ApiService, private auth: AuthService) {}
 
   ngOnInit() {
-    this.api.getApartments(this.user.id).subscribe((res: any[]) => {
+    this.loadData();
+  }
+
+  loadData() {
+    this.loading = true;
+
+    this.api.getApartments(this.user.id).subscribe(res => {
       this.apartment = res[0] || null;
       this.loading   = false;
     });
 
-    this.api.getContracts().subscribe((res: any[]) => {
-      this.contract = res.find(c => c.tenant_id === this.user.id) || null;
+    this.api.getContracts().subscribe(res => {
+      this.contract = res.find((c: any) => c.tenant_id === this.user.id) || null;
     });
 
-    this.api.getFactures().subscribe((res: any[]) => {
-      this.factures = res.filter(f => {
-        return this.contract && f.contract_id === this.contract.id;
-      });
+    this.api.getFactures().subscribe(res => {
+      this.factures = res.filter((f: any) =>
+        this.contract && f.contract_id === this.contract.id
+      );
+    });
+  }
+
+  // ✅ Le locataire entre son code pour rejoindre un appartement
+  joinApartment() {
+    if (!this.joinCode.trim()) return;
+
+    this.joinLoading = true;
+    this.joinMsg     = '';
+
+    this.api.joinApartment({
+      code:    this.joinCode.trim().toUpperCase(),
+      user_id: this.user.id
+    }).subscribe({
+      next: (res: any) => {
+        this.joinMsg     = '✅ ' + (res.message || 'Appartement rejoint avec succès !');
+        this.joinLoading = false;
+        this.joinCode    = '';
+
+        // Après 1.5s, ferme le modal et recharge les données
+        setTimeout(() => {
+          this.showJoinModal = false;
+          this.joinMsg       = '';
+          this.loadData();
+        }, 1500);
+      },
+      error: (err: any) => {
+        this.joinMsg     = '❌ ' + (err.error?.detail || 'Code invalide. Vérifiez le code.');
+        this.joinLoading = false;
+      }
     });
   }
 

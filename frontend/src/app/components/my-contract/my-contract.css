@@ -1,0 +1,171 @@
+.page-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--navy);
+  margin-bottom: 24px;
+}
+
+/* APT INFO CARD */
+.apt-info-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.apt-thumb {
+  width: 100px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.apt-details h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 8px;
+}
+
+.apt-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+/* STATUS BANNER */
+.status-banner {
+  border-radius: 14px;
+  padding: 16px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  border: 2px solid transparent;
+}
+.status-banner.actif {
+  background: #f0fdf4;
+  color: #16a34a;
+  border-color: #22c55e;
+}
+.status-banner.termine {
+  background: #f8fafc;
+  color: var(--muted);
+  border-color: var(--border);
+}
+.status-banner.resilie {
+  background: #fff1f2;
+  color: #dc2626;
+  border-color: #ef4444;
+}
+
+/* DETAILS CARD */
+.details-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.details-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.detail-box {
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detail-label {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.detail-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--navy);
+}
+.detail-value.gold { color: var(--gold); }
+
+/* PROGRESS */
+.progress-section { display: flex; flex-direction: column; gap: 8px; }
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.progress-bar {
+  height: 10px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--gold);
+  border-radius: 99px;
+  transition: width 0.5s ease;
+}
+
+.progress-dates {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* DOWNLOAD */
+.btn-download {
+  background: none;
+  border: 2px solid var(--gold);
+  color: var(--gold);
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+.btn-download:hover { background: var(--gold); color: white; }
+
+/* EMPTY / LOADING */
+.empty-state { text-align: center; padding: 80px 20px; color: var(--muted); }
+.empty-icon  { font-size: 60px; margin-bottom: 16px; }
+.empty-state h3 { font-size: 18px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+.loading { display: flex; justify-content: center; padding: 80px; }
+.spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
