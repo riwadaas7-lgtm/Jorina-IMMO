@@ -28,17 +28,12 @@
         <span class="facture-date">Date: {{ f.date_facture }}</span>
       </div>
 
-      <span class="facture-montant">{{ f.montant | number }}€</span>
+{{ f.montant | number }} Dt
 
-      <button class="btn-payer"
-              *ngIf="f.status !== 'payee'"
-              (click)="payer(f)">
-        Payer
-      </button>
-
-      <span class="badge-payee" *ngIf="f.status === 'payee'">
-        ✓ Payée
-      </span>
+      <div class="facture-status">
+        <span class="status-badge" [ngClass]="f.status">{{ statusLabel(f.status) }}</span>
+        <span class="status-date">{{ f.date_delai }} <br> <small>{{ f.periode_start }} → {{ f.periode_end }}</small></span>
+      </div>
 
     </div>
 

@@ -11,14 +11,14 @@ export class ApiService {
   // HttpClient est injecté automatiquement par Angular (Dependency Injection)
     // ─── AUTH ───────────────────────────────────────
 
-  // ✅ Connexion → POST /login
+  //  Connexion → POST /login
   // Envoie email + password + role au backend
   // Retourne un Observable (comme une Promise)
   login(data: any) {
     return this.http.post(this.baseUrl + '/login', data);
   }
 
-  // ✅ Inscription → POST /register
+  //  Inscription → POST /register
   // Envoie nom + prenom + email + password + role
   register(data: any) {
     return this.http.post(this.baseUrl + '/register', data);
@@ -40,8 +40,13 @@ export class ApiService {
  
 
   // ─── DÉPARTEMENTS ────────────────────────────────
-  getDepartments()              { return this.http.get<any[]>(this.baseUrl + '/departments'); }
-  addDepartment(data: any)      { return this.http.post(this.baseUrl + '/departments', data); }
+  getDepartments(ownerId: number) {
+    return this.http.get<any[]>(this.baseUrl + '/departments?owner_id=' + ownerId);
+  }
+
+  addDepartment(dep: any) {
+    return this.http.post(this.baseUrl + '/departments', dep);
+  }
   updateDepartment(id: number, data: any) { return this.http.put(this.baseUrl + '/departments/' + id, data); }
   deleteDepartment(id: number)  { return this.http.delete(this.baseUrl + '/departments/' + id); }
 
@@ -77,4 +82,5 @@ export class ApiService {
 
   // Marque une facture comme payée
   payFacture(id: number)       { return this.http.put(this.baseUrl + '/factures/' + id + '/pay', {}); }
+  updateFactureStatus(id: number, status: string) { return this.http.put(this.baseUrl + '/factures/' + id + '/status', {status}); }
 }

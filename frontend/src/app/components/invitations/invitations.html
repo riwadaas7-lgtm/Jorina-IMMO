@@ -49,26 +49,10 @@
       <div class="save-success" *ngIf="saved">
         ✅ Code enregistré ! Le locataire peut maintenant rejoindre.
       </div>
-    </div>
 
-    <!-- CARTE : Historique des codes -->
-    <div class="inv-card">
-      <h3>Codes générés récemment</h3>
-
-      <div class="history-list" *ngIf="history.length > 0">
-        <div class="history-item" *ngFor="let h of history">
-          <span class="history-code">{{ h.code }}</span>
-          <span class="history-apt">{{ h.apt }}</span>
-          <span class="history-date">{{ h.date }}</span>
-        </div>
-      </div>
-
-      <div class="empty-history" *ngIf="history.length === 0">
-        <p>🔑 Aucun code généré pour l'instant.</p>
-        <p>Générez un code à gauche et associez-le à un appartement.</p>
-      </div>
     </div>
 
   </div>
 
 </div>
+

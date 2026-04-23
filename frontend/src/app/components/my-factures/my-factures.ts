@@ -39,9 +39,12 @@ export class MyFacturesComponent implements OnInit {
     );
   }
 
-  payer(f: any) {
-    // Mark as paid via API
-    this.api.payFacture(f.id).subscribe(() => {
-      f.status = 'payee';
-    });}
+  statusLabel(s: string) {
+    const map: any = {
+      en_attente: 'En attente',
+      payee: 'Payée',
+      en_retard: 'En retard'
+    };
+    return map[s] || s;
+  }
 }

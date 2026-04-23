@@ -1,13 +1,9 @@
-<div class="page" *ngIf="!loading">
+<div class="page"> <!-- FORCE SHOW, ignore loading -->
 
   <!-- HEADER -->
   <div class="page-header-row">
-    <h2 class="page-title">Mon Espace Locataire</h2>
-    <button class="btn-join-classroom"
-            (click)="showJoinModal = true"
-            *ngIf="!apartment">
-      + Rejoindre un appartement
-    </button>
+    <h2 class="page-title">Mon Appartement</h2>
+    <button class="btn-join-classroom" *ngIf="!apartment" (click)="onJoinClick()">+ Rejoindre un appartement</button>
   </div>
 
   <!-- ══ PAS D'APPARTEMENT ══ -->
@@ -28,7 +24,7 @@
         <p class="hero-address">{{ apartment.description || 'Adresse non renseignée' }}</p>
         <p class="hero-owner">Appartement: {{ apartment.nom }}</p>
       </div>
-      <div class="price-badge">{{ apartment.price | number }}€/mois</div>
+{{ apartment.price | number }} Dt/mois
     </div>
   </div>
 
@@ -58,7 +54,7 @@
       <div class="summary-icon navy">💳</div>
       <div class="summary-info">
         <span class="summary-label">Mes Paiements</span>
-        <span class="summary-value">{{ totalPaiements | number }}€</span>
+{{ totalPaiements | number }} Dt
         <span class="summary-sub">Total payé</span>
       </div>
     </div>
@@ -73,8 +69,8 @@
 </div>
 
 <!-- ══ MODAL REJOINDRE ══ -->
-<div class="modal-overlay" *ngIf="showJoinModal" (click)="showJoinModal = false">
-  <div class="modal join-modal" (click)="$event.stopPropagation()">
+<div class="join-modal-overlay" *ngIf="showJoinModal" (click)="showJoinModal = false">
+  <div class="modal join-modal" style="max-width: 420px; background: #ffffff !important; border-radius: 24px; padding: 2.5rem 2rem; box-shadow: 0 25px 80px rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.3); min-height: 320px; display: flex; flex-direction: column; gap: 1rem;" (click)="$event.stopPropagation()">
 
     <div class="join-modal-icon">🔑</div>
     <h3>Rejoindre un appartement</h3>

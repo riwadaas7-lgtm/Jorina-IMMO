@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
+from datetime import date, datetime
 from database import SessionLocal, engine
 import models
 import random
@@ -19,17 +20,13 @@ SECRET_KEY  = "JORILINA_SECRET_2024"
 ALGORITHM   = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 heures
 
-# ─── CRÉER LES TABLES AU DÉMARRAGE ────────────────────────────────────────────
-# SQLAlchemy lit les models.py et crée les tables si elles n'existent pas
+# ─── CREER LES TABLES AU DEMARRAGE ────────────────────────────────────────────
+# SQLAlchemy lit les models.py et cree les tables si elles n'existent pas
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-# ─── DOSSIER POUR LES IMAGES UPLOADÉES ────────────────────────────────────────
-os.makedirs("uploads", exist_ok=True)
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
-
-# ─── CORS : autorise Angular (port 4200) à parler au backend (port 8000) ──────
+# ─── CORS : autorise Angular (port 4200) a parler au backend (port 8000) ──────
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -37,7 +34,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 # ─── SESSION DB ───────────────────────────────────────────────────────────────
 def get_db():
     db = SessionLocal()
@@ -47,7 +43,6 @@ def get_db():
         db.close()
 
 # ─── FONCTIONS UTILITAIRES ────────────────────────────────────────────────────
-
 def generate_code():
     """Génère un code unique de 6 caractères pour les appartements"""
     chars = string.ascii_uppercase + string.digits
@@ -62,7 +57,6 @@ def verify_password(plain: str, hashed: str) -> bool:
     return hashlib.sha256(plain.encode()).hexdigest() == hashed
 
 def create_token(user_id: int, role: str) -> str:
-    """Crée un JWT token avec l'ID et le rôle de l'utilisateur"""
     payload = {
         "sub": str(user_id),
         "role": role,
@@ -70,7 +64,11 @@ def create_token(user_id: int, role: str) -> str:
     }
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
-# ─── SCHEMAS PYDANTIC ─────────────────────────────────────────────────────────
+# ─── DOSSIER POUR LES IMAGES UPLOADEES ────────────────────────────────────────
+os.makedirs("uploads", exist_ok=True)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
+#  SCHEMAS PYDANTIC 
 # Pydantic valide automatiquement les données reçues du frontend
 
 class RegisterData(BaseModel):
@@ -80,7 +78,7 @@ class RegisterData(BaseModel):
     password:  str
     telephone: Optional[str] = ""
     cin:       Optional[str] = ""
-    role:      str            # 'proprietaire' ou 'locataire'
+    role:      str           
 
 class LoginData(BaseModel):
     email:    str
@@ -97,7 +95,7 @@ class DepartmentData(BaseModel):
     code_postal: Optional[str] = ""
     address:     Optional[str] = ""
     photo:       Optional[str] = ""
-
+    owner_id:    Optional[int] = None
 class ApartmentData(BaseModel):
     nom:           str
     etage:         Optional[int] = 0
@@ -118,10 +116,13 @@ class ContractData(BaseModel):
     contract_file: Optional[str] = ""
 
 class FactureData(BaseModel):
-    type:         str
-    montant:      int
-    date_facture: str
-    contract_id:  int
+    type:                 str
+    montant:              int
+    date_facture:         str
+    periode_start:        Optional[str] = ""
+    periode_end:          Optional[str] = ""
+    date_delai:           str
+    contract_id:          int
 
 class UserUpdateData(BaseModel):
     nom:       str
@@ -129,18 +130,16 @@ class UserUpdateData(BaseModel):
     email:     str
     telephone: Optional[str] = ""
 
-# ══════════════════════════════════════════════════════════════════════════════
+class FactureStatusUpdate(BaseModel):
+    status: str
+
 # ROOT
-# ══════════════════════════════════════════════════════════════════════════════
 
 @app.get("/")
 def root():
-    return {"message": "Jorilina IMMO API fonctionne ✅"}
+    return {"message": "Jorilina IMMO API fonctionne "}
 
-# ══════════════════════════════════════════════════════════════════════════════
 # UPLOAD IMAGE
-# ══════════════════════════════════════════════════════════════════════════════
-
 @app.post("/upload-image")
 def upload_image(file: UploadFile = File(...)):
     """Reçoit une image, la sauvegarde dans /uploads, retourne son URL"""
@@ -153,15 +152,13 @@ def upload_image(file: UploadFile = File(...)):
 
     return {"url": f"http://127.0.0.1:8000/uploads/{filename}"}
 
-# ══════════════════════════════════════════════════════════════════════════════
-# AUTH — REGISTER & LOGIN
-# ══════════════════════════════════════════════════════════════════════════════
+# REGISTER & LOGIN
 
 @app.post("/register")
 def register(data: RegisterData, db: Session = Depends(get_db)):
     """Crée un nouveau compte utilisateur"""
 
-    # Vérifie si l'email est déjà utilisé
+    # Verifie si l'email est deja utilise
     existing = db.query(models.User).filter(
         models.User.email == data.email
     ).first()
@@ -169,7 +166,7 @@ def register(data: RegisterData, db: Session = Depends(get_db)):
     if existing:
         raise HTTPException(status_code=400, detail="Email déjà utilisé")
 
-    # Crée l'utilisateur avec mot de passe hashé
+    # Cree l'utilisateur avec mot de passe hashe
     user = models.User(
         nom       = data.nom,
         prenom    = data.prenom,
@@ -183,7 +180,7 @@ def register(data: RegisterData, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(user)
 
-    # Génère le token et retourne la réponse
+    # Genere le token et retourne la reponse
     token = create_token(user.id, user.role)
     return {
         "access_token": token,
@@ -232,29 +229,41 @@ def login(data: LoginData, db: Session = Depends(get_db)):
         }
     }
 
-# ══════════════════════════════════════════════════════════════════════════════
 # DEPARTMENTS
-# ══════════════════════════════════════════════════════════════════════════════
 
+# ✅ GET — chaque propriétaire voit seulement SES départements
 @app.get("/departments")
-def get_departments(db: Session = Depends(get_db)):
-    return db.query(models.Department).all()
+def get_departments(owner_id: int, db: Session = Depends(get_db)):
+    # owner_id vient de l'URL : /departments?owner_id=1
+    return db.query(models.Department).filter(
+        models.Department.owner_id == owner_id
+    ).all()
 
+
+# ✅ POST — quand on crée un département, on enregistre le propriétaire
 @app.post("/departments")
 def add_department(data: DepartmentData, db: Session = Depends(get_db)):
-    dep = models.Department(**data.dict())
+    dep = models.Department(
+        nom         = data.nom,
+        ville       = data.ville,
+        code_postal = data.code_postal,
+        address     = data.address,
+        photo       = data.photo,
+        owner_id    = data.owner_id  # ✅ on enregistre qui crée le département
+    )
     db.add(dep)
     db.commit()
     db.refresh(dep)
     return dep
 
+
+# PUT et DELETE restent pareils
 @app.put("/departments/{id}")
 def update_department(id: int, data: DepartmentData, db: Session = Depends(get_db)):
     dep = db.query(models.Department).get(id)
-    if not dep:
-        raise HTTPException(status_code=404, detail="Département introuvable")
-    for key, value in data.dict().items():
-        setattr(dep, key, value)
+    if not dep: raise HTTPException(404, "Département introuvable")
+    for k, v in data.dict().items():
+        setattr(dep, k, v)
     db.commit()
     db.refresh(dep)
     return dep
@@ -262,15 +271,13 @@ def update_department(id: int, data: DepartmentData, db: Session = Depends(get_d
 @app.delete("/departments/{id}")
 def delete_department(id: int, db: Session = Depends(get_db)):
     dep = db.query(models.Department).get(id)
-    if not dep:
-        raise HTTPException(status_code=404, detail="Département introuvable")
+    if not dep: raise HTTPException(404, "Département introuvable")
     db.delete(dep)
     db.commit()
     return {"message": "Département supprimé"}
 
-# ══════════════════════════════════════════════════════════════════════════════
+
 # APARTMENTS
-# ══════════════════════════════════════════════════════════════════════════════
 
 @app.get("/apartments")
 def get_all_apartments(db: Session = Depends(get_db)):
@@ -285,7 +292,7 @@ def get_apartments_for_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Utilisateur introuvable")
 
     if user.role == "proprietaire":
-        # Le propriétaire voit tous les appartements
+        # Le proprietaire voit tous ses appartements
         return db.query(models.Apartment).all()
     else:
         # Le locataire voit seulement son appartement
@@ -333,9 +340,7 @@ def delete_apartment(id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"message": "Appartement supprimé"}
 
-# ══════════════════════════════════════════════════════════════════════════════
 # JOIN — locataire rejoint un appartement avec un code
-# ══════════════════════════════════════════════════════════════════════════════
 
 @app.post("/join")
 def join_apartment(data: JoinData, db: Session = Depends(get_db)):
@@ -363,9 +368,7 @@ def join_apartment(data: JoinData, db: Session = Depends(get_db)):
 
     return {"message": f"Vous avez rejoint l'appartement {ap.nom} !"}
 
-# ══════════════════════════════════════════════════════════════════════════════
 # USERS
-# ══════════════════════════════════════════════════════════════════════════════
 
 @app.get("/users")
 def get_users(db: Session = Depends(get_db)):
@@ -400,13 +403,21 @@ def delete_user(id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"message": "Utilisateur supprimé"}
 
-# ══════════════════════════════════════════════════════════════════════════════
 # CONTRACTS
-# ══════════════════════════════════════════════════════════════════════════════
 
 @app.get("/contracts")
 def get_contracts(db: Session = Depends(get_db)):
-    return db.query(models.Contract).all()
+    contracts = db.query(models.Contract).join(models.User, models.Contract.tenant_id == models.User.id).outerjoin(models.Apartment, models.Contract.apartment_id == models.Apartment.id).add_columns(
+        models.User.nom.label('tenant_name'),
+        models.User.prenom.label('tenant_prenom'),
+        models.Apartment.nom.label('apartment_name')
+    ).all()
+    result = []
+    for c, tenant_name, tenant_prenom, apartment_name in contracts:
+        c.tenant_name = f"{tenant_name or ''} {tenant_prenom or ''}".strip() or '—'
+        c.apartment_name = apartment_name or '—'
+        result.append(c)
+    return result
 
 @app.post("/contracts")
 def add_contract(data: ContractData, db: Session = Depends(get_db)):
@@ -436,17 +447,42 @@ def delete_contract(id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"message": "Contrat supprimé"}
 
-# ══════════════════════════════════════════════════════════════════════════════
 # FACTURES
-# ══════════════════════════════════════════════════════════════════════════════
 
 @app.get("/factures")
 def get_factures(db: Session = Depends(get_db)):
-    return db.query(models.Facture).all()
+    # Auto-update overdue factures
+    today = date.today().isoformat()
+    overdue = db.query(models.Facture).filter(
+        models.Facture.date_delai < today,
+        models.Facture.status != 'payee'
+    ).update({models.Facture.status: 'en_retard'})
+    db.commit()
+    
+    factures = db.query(models.Facture).join(models.Contract, models.Facture.contract_id == models.Contract.id).join(models.User, models.Contract.tenant_id == models.User.id).outerjoin(models.Apartment, models.Contract.apartment_id == models.Apartment.id).add_columns(
+        models.User.nom.label('tenant_name'),
+        models.User.prenom.label('tenant_prenom'),
+        models.Apartment.nom.label('apartment_name')
+    ).all()
+    result = []
+    for f, tenant_name, tenant_prenom, apartment_name in factures:
+        f.tenant_name = f"{tenant_name or ''} {tenant_prenom or ''}".strip() or '—'
+        f.apartment_name = apartment_name or '—'
+        result.append(f)
+    return result
 
 @app.post("/factures")
 def add_facture(data: FactureData, db: Session = Depends(get_db)):
-    facture = models.Facture(**data.dict(), status="en_attente")
+    facture_data = data.dict()
+    facture = models.Facture(
+        type = facture_data['type'],
+        montant = facture_data['montant'],
+        date_facture = facture_data['date_facture'],
+        periode_consommation = f"{facture_data.get('periode_start', '')} → {facture_data.get('periode_end', '')}",
+        date_delai = facture_data['date_delai'],
+        contract_id = facture_data['contract_id'],
+        status="en_attente"
+    )
     db.add(facture)
     db.commit()
     db.refresh(facture)
@@ -454,13 +490,28 @@ def add_facture(data: FactureData, db: Session = Depends(get_db)):
 
 @app.put("/factures/{id}/pay")
 def pay_facture(id: int, db: Session = Depends(get_db)):
-    """Marque une facture comme payée"""
+    """Marque une facture comme payee"""
     facture = db.query(models.Facture).get(id)
     if not facture:
         raise HTTPException(status_code=404, detail="Facture introuvable")
     facture.status = "payee"
     db.commit()
     return {"message": "Facture marquée comme payée"}
+
+
+@app.put("/factures/{id}/status")
+def update_facture_status(id: int, data: FactureStatusUpdate, db: Session = Depends(get_db)):
+    '''Change l'état de la facture'''
+    facture = db.query(models.Facture).get(id)
+    if not facture:
+        raise HTTPException(status_code=404, detail="Facture introuvable")
+    if data.status not in ["en_attente", "payee", "en_retard"]:
+        raise HTTPException(status_code=400, detail="Status invalide")
+    facture.status = data.status
+    db.commit()
+    db.refresh(facture)
+    return facture
+
 
 @app.delete("/factures/{id}")
 def delete_facture(id: int, db: Session = Depends(get_db)):

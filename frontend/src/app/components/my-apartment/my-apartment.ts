@@ -1,17 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';   // ✅ nécessaire pour [(ngModel)]
+import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-my-apartment',
   standalone: true,
-  imports: [CommonModule, FormsModule],          // ✅ FormsModule ajouté
+  imports: [CommonModule, FormsModule],
   templateUrl: './my-apartment.html',
   styleUrl: './my-apartment.css'
 })
-export class MyApartmentComponent implements OnInit {
+export class MyApartmentComponent implements OnInit, AfterViewInit {
 
   user      = JSON.parse(localStorage.getItem('user') || '{}');
   apartment: any  = null;
@@ -31,26 +31,37 @@ export class MyApartmentComponent implements OnInit {
     this.loadData();
   }
 
+  ngAfterViewInit() {}
+
   loadData() {
     this.loading = true;
 
-    this.api.getApartments(this.user.id).subscribe(res => {
-      this.apartment = res[0] || null;
-      this.loading   = false;
+    this.api.getApartments(this.user.id).subscribe({
+      next: (res) => {
+        this.apartment = res[0] || null;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.apartment = null;
+        this.loading = false;
+      }
     });
 
-    this.api.getContracts().subscribe(res => {
-      this.contract = res.find((c: any) => c.tenant_id === this.user.id) || null;
+    this.api.getContracts().subscribe({
+      next: (res) => {
+        this.contract = res.find((c: any) => c.tenant_id === this.user.id) || null;
+      },
+      error: (err) => {}
     });
 
-    this.api.getFactures().subscribe(res => {
-      this.factures = res.filter((f: any) =>
-        this.contract && f.contract_id === this.contract.id
-      );
+    this.api.getFactures().subscribe({
+      next: (res) => {
+        this.factures = res.filter((f: any) => this.contract && f.contract_id === this.contract.id);
+      },
+      error: (err) => {}
     });
   }
 
-  // ✅ Le locataire entre son code pour rejoindre un appartement
   joinApartment() {
     if (!this.joinCode.trim()) return;
 
@@ -66,7 +77,6 @@ export class MyApartmentComponent implements OnInit {
         this.joinLoading = false;
         this.joinCode    = '';
 
-        // Après 1.5s, ferme le modal et recharge les données
         setTimeout(() => {
           this.showJoinModal = false;
           this.joinMsg       = '';
@@ -78,6 +88,10 @@ export class MyApartmentComponent implements OnInit {
         this.joinLoading = false;
       }
     });
+  }
+
+  onJoinClick() {
+    this.showJoinModal = true;
   }
 
   get pendingFactures() {

@@ -72,7 +72,7 @@
 
       <div class="contract-actions">
         <button class="btn-voir" (click)="viewContract(c)">Voir</button>
-        <a class="btn-dl" *ngIf="c.contract_file" [href]="c.contract_file" target="_blank">Telecharger</a>
+
         <button class="btn-dl" *ngIf="!c.contract_file" disabled>Aucun fichier</button>
         <button class="btn-delete" (click)="delete(c.id)">Supprimer</button>
       </div>

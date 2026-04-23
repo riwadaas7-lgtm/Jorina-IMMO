@@ -42,6 +42,7 @@ class Apartment(Base):
     department = relationship("Department", back_populates="apartments")
     tenants    = relationship("User",     back_populates="apartment")
     contracts  = relationship("Contract", back_populates="apartment", cascade="all, delete")
+    factures   = relationship("Facture", back_populates="apartment", cascade="all, delete")
 
 
 class User(Base):
@@ -94,9 +95,16 @@ class Facture(Base):
     montant      = Column(Integer,     nullable=False)
     date_facture = Column(String(20),  nullable=False)
     status       = Column(String(20),  default="en_attente")  # en_attente / payee / en_retard
+    periode_consommation = Column(String(50), nullable=True)
+    date_delai           = Column(String(20), nullable=False)
 
     # Clé étrangère vers contracts
     contract_id  = Column(Integer, ForeignKey("contracts.id"))
+    apartment_id = Column(Integer, ForeignKey("apartments.id"), nullable=True)
+
+    # Relations
+    contract    = relationship("Contract", back_populates="factures")
+    apartment   = relationship("Apartment", back_populates="factures")
 
     # Relation
     contract = relationship("Contract", back_populates="factures")

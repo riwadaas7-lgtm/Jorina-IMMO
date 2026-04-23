@@ -21,9 +21,6 @@ export class InvitationsComponent implements OnInit {
   copied  = false;
   saved   = false;
 
-  // Historique des codes générés (en mémoire)
-  history: { code: string; apt: string; date: string }[] = [];
-
   constructor(private api: ApiService) {}
 
   ngOnInit() {
@@ -66,12 +63,6 @@ export class InvitationsComponent implements OnInit {
       ...apt,
       code: this.currentCode
     }).subscribe(() => {
-      // Ajoute à l'historique local
-      this.history.unshift({
-        code: this.currentCode,
-        apt:  apt?.nom || 'Appartement',
-        date: new Date().toLocaleDateString('fr-FR')
-      });
       this.saved = true;
       setTimeout(() => this.saved = false, 3000);
     });

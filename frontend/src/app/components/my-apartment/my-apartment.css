@@ -148,16 +148,13 @@
 
 /* Bouton style Google Classroom */
 .btn-join-classroom {
+  @extend .btn;
   background: var(--navy);
   color: white;
-  border: none;
   border-radius: 12px;
-  padding: 12px 22px;
+  padding: 13px 22px;
   font-size: 15px;
-  font-weight: 700;
-  transition: opacity 0.2s;
 }
-.btn-join-classroom:hover { opacity: 0.85; }
 
 /* Modal rejoindre */
 .join-modal {
@@ -260,3 +257,126 @@
 }
 .join-msg.success { background: #f0fdf4; color: #16a34a; }
 .join-msg.error   { background: #fff1f2; color: #dc2626; }
+
+/* JOIN MODAL OVERLAY - FIXED & VISIBLE */
+.join-modal-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(0, 0, 0, 0.6) !important;
+  backdrop-filter: blur(12px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 9999 !important;
+  padding: 2rem !important;
+  animation: modalFadeIn 0.3s ease-out !important;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.join-modal {
+  text-align: center !important;
+  max-width: 420px !important;
+  width: 90vw !important;
+  background: var(--white) !important;
+  border-radius: 20px !important;
+  padding: 2.5rem 2rem !important;
+  box-shadow: var(--shadow-lg) !important;
+  position: relative !important;
+  animation: modalSlideUp 0.3s ease-out !important;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+}
+
+@keyframes modalSlideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.join-modal-icon {
+  font-size: 4rem !important;
+  margin-bottom: 1rem !important;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+}
+
+.join-modal h3 {
+  font-size: 1.5rem !important;
+  font-weight: 800 !important;
+  color: var(--navy) !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.join-sub {
+  color: var(--muted) !important;
+  font-size: 1rem !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.join-input {
+  width: 100% !important;
+  padding: 1.25rem 1.5rem !important;
+  font-size: 1.75rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.25rem !important;
+  text-align: center !important;
+  text-transform: uppercase !important;
+  border: 3px solid var(--border) !important;
+  border-radius: 16px !important;
+  outline: none !important;
+  background: rgba(255,255,255,0.9) !important;
+  transition: all 0.3s ease !important;
+  margin-bottom: 1rem !important;
+  font-family: monospace !important;
+}
+
+.join-input:focus {
+  border-color: var(--gold) !important;
+  background: var(--white) !important;
+  box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.1) !important;
+  transform: scale(1.02) !important;
+}
+
+.join-msg {
+  padding: 0.75rem 1rem !important;
+  border-radius: 12px !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.join-msg.success {
+  background: #ecfdf5 !important;
+  color: #16a34a !important;
+  border: 1px solid #bbf7d0 !important;
+}
+
+.join-msg.error {
+  background: #fef2f2 !important;
+  color: #dc2626 !important;
+  border: 1px solid #fecaca !important;
+}
+
+.modal-actions {
+  display: flex !important;
+  gap: 1rem !important;
+  margin-top: auto !important;
+}
+
+.btn-cancel,
+.btn-save {
+  flex: 1 !important;
+  border-radius: 12px !important;
+  padding: 1rem 1.5rem !important;
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+  transition: all 0.2s !important;
+  border: none !important;
+  cursor: pointer !important;
+}
+
+/* Modal buttons now use global .btn classes */

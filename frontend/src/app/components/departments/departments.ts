@@ -12,24 +12,24 @@ import { ApiService } from '../../services/api';
 })
 export class DepartmentsComponent implements OnInit {
 
-  // Utilisateur connecté
+  // Utilisateur connecte
   user    = JSON.parse(localStorage.getItem('user') || '{}');
   isOwner = this.user?.role === 'proprietaire';
 
-  // Données
+  // Donnees
   departments: any[] = [];
   apartments:  any[] = [];
 
-  // ✅ Pour le skeleton loader (6 cartes grises pendant le chargement)
+  //  Pour le skeleton loader 
   isLoading    = false;
   loadError    = '';
-  skeletonCards = Array.from({ length: 6 }); // tableau de 6 éléments vides
+  skeletonCards = Array.from({ length: 6 }); 
 
-  // Formulaire ajout département
+  // Formulaire ajout departement
   showAddModal = false;
   nom = ''; ville = ''; code_postal = ''; address = ''; photo = '';
 
-  // Formulaire modification département
+  // Formulaire modification departement
   editingId         = null as number | null;
   editingNom        = '';
   editingVille      = '';
@@ -37,14 +37,14 @@ export class DepartmentsComponent implements OnInit {
   editingAddress    = '';
   editingPhoto      = '';
 
-  // Formulaire ajout appartement dans un département
+  // Formulaire ajout appartement dans un departement
   apartmentNom         = '';
   apartmentEtage       = 0;
   apartmentPrice       = 0;
   apartmentDescription = '';
   apartmentPhoto       = '';
 
-  // ID du département dont on affiche les détails
+  // ID du departement dont on affiche les details
   selectedDepartmentId: number | null = null;
 
   constructor(private api: ApiService) {}
@@ -53,20 +53,20 @@ export class DepartmentsComponent implements OnInit {
     this.load();
   }
 
-  // ✅ Appelé par le bouton "Réessayer" dans le HTML
+  // Appele par le bouton "Ressayer" dans le HTML
   load() {
     this.loadDepartments();
     this.loadApartments();
   }
 
-  // ✅ Charge les départements avec gestion loading/erreur
+  //Charge les departements avec gestion loading/erreur
   loadDepartments() {
     this.isLoading = true;
     this.loadError = '';
 
-    this.api.getDepartments().subscribe({
+    this.api.getDepartments(this.user.id).subscribe({
       next: (res) => {
-        // Ajoute showMenu et imageLoaded à chaque département
+        // Ajoute showMenu et imageLoaded a chaque departement
         this.departments = res.map(d => ({
           ...d,
           showMenu:    false,
@@ -76,12 +76,12 @@ export class DepartmentsComponent implements OnInit {
       },
       error: () => {
         this.isLoading = false;
-        this.loadError = 'Impossible de charger les départements. Vérifiez le serveur.';
+        this.loadError = 'Impossible de charger les departements. Verifiez le serveur.';
       }
     });
   }
 
-  // ✅ Charge tous les appartements
+  //  Charge tous les appartements
   loadApartments() {
     this.api.getAllApartments().subscribe({
       next:  (res) => this.apartments = res,
@@ -89,38 +89,39 @@ export class DepartmentsComponent implements OnInit {
     });
   }
 
-  // ✅ Appelé quand l'image d'un département finit de charger
+  // Appele quand l'image d'un departement finit de charger
   // Permet l'effet de fondu (opacity 0 → 1)
   onImageLoad(d: any) {
     d.imageLoaded = true;
   }
 
-  // ✅ Retourne les appartements d'un département donné
+  // Retourne les appartements d'un departement donne
   departmentApartments(departmentId: number): any[] {
     return this.apartments.filter(a => a.department_id === departmentId);
   }
 
-  // ✅ Affiche/cache les appartements sous une carte département
+  // Affiche/cache les appartements sous une carte departement
   toggleDepartmentDetails(d: any) {
     this.selectedDepartmentId = this.selectedDepartmentId === d.id ? null : d.id;
   }
 
-  // ✅ Affiche/cache le menu ⋮ (ferme les autres menus ouverts)
+  // Affiche/cache le menu ⋮ (ferme les autres menus ouverts)
   toggleMenu(d: any) {
     this.departments.forEach(x => { if (x !== d) x.showMenu = false; });
     d.showMenu = !d.showMenu;
   }
 
-  // ✅ Ajoute un nouveau département
+  // Ajoute un nouveau dpartement
   add() {
     if (!this.nom || !this.ville) return;
 
     this.api.addDepartment({
       nom: this.nom, ville: this.ville,
       code_postal: this.code_postal,
-      address: this.address, photo: this.photo
+      address: this.address, photo: this.photo,
+      owner_id:    this.user.id
     }).subscribe(() => {
-      // Réinitialise le formulaire
+      // Reinitialise le form
       this.nom = ''; this.ville = ''; this.code_postal = '';
       this.address = ''; this.photo = '';
       this.showAddModal = false;
@@ -128,7 +129,7 @@ export class DepartmentsComponent implements OnInit {
     });
   }
 
-  // ✅ Supprime un département
+  // Supprime un departement
   delete(id: number) {
     if (!confirm('Supprimer ce département ?')) return;
     this.api.deleteDepartment(id).subscribe(() => {
@@ -138,7 +139,7 @@ export class DepartmentsComponent implements OnInit {
     });
   }
 
-  // ✅ Prépare le formulaire de modification
+  //  Prepare le formulaire de modification
   startEdit(d: any) {
     this.editingId         = d.id;
     this.editingNom        = d.nom;
@@ -151,7 +152,7 @@ export class DepartmentsComponent implements OnInit {
 
   cancelEdit() { this.editingId = null; }
 
-  // ✅ Sauvegarde les modifications du département
+  //Sauvegarde les modifications du departement
   saveEdit() {
     if (this.editingId === null) return;
     this.api.updateDepartment(this.editingId, {
@@ -166,7 +167,7 @@ export class DepartmentsComponent implements OnInit {
     });
   }
 
-  // ✅ Upload photo pour département (editing = true → modal modification)
+  // Upload photo pour departement (editing = true → modal modification)
   onSelectDepartmentPhoto(event: Event, editing = false) {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
@@ -176,7 +177,7 @@ export class DepartmentsComponent implements OnInit {
     });
   }
 
-  // ✅ Ajoute un appartement dans le département en cours de modification
+  //  Ajoute un appartement dans le departement en cours de modification
   addApartmentToEditingDepartment() {
     if (this.editingId === null || !this.apartmentNom) return;
     this.api.addApartment({
@@ -197,7 +198,7 @@ export class DepartmentsComponent implements OnInit {
     });
   }
 
-  // ✅ Upload photo appartement
+  //  Upload photo appartement
   onSelectApartmentPhoto(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
@@ -206,7 +207,7 @@ export class DepartmentsComponent implements OnInit {
     });
   }
 
-  // ✅ Supprime un appartement
+  // Supprime un appartement
   deleteApartment(id: number) {
     if (!confirm('Supprimer cet appartement ?')) return;
     this.api.deleteApartment(id).subscribe(() => this.loadApartments());
