@@ -1,13 +1,12 @@
 <div class="page">
 
+  <!-- HEADER -->
   <div class="page-header">
-
     <h2 class="page-title">Gestion des Factures</h2>
-<button class="btn-add" (click)="openAddModal()">➕ Ajouter</button>
+    <button class="btn-add" (click)="openAddModal()">+ Nouvelle Facture</button>
   </div>
 
-
-  <!-- STATS -->
+  <!-- STAT CARDS -->
   <div class="stats-row">
     <div class="stat-card">
       <span class="stat-label">Total</span>
@@ -26,19 +25,16 @@
       <span class="stat-value red">{{ countByStatus('en_retard') }}</span>
     </div>
     <div class="stat-card">
-      <span class="stat-label">Montant total (€)</span>
-<span class="stat-value gold">{{ totalMontant() | number }} Dt</span>
+      <span class="stat-label">Montant total</span>
+      <span class="stat-value gold">{{ totalMontant() | number }}dt</span>
     </div>
   </div>
 
   <!-- SEARCH -->
   <div class="search-filter">
-<div class="search-inner">
-      <span id="search-icon" aria-hidden="true">🔍</span>
-      <label for="search-input" class="sr-only">Rechercher</label>
-      <input id="search-input"
-             type="text"
-             name="searchTerm"
+    <div class="search-inner">
+      <span>🔍</span>
+      <input type="text"
              placeholder="Rechercher par locataire ou appartement..."
              [(ngModel)]="searchTerm" />
     </div>
@@ -47,34 +43,27 @@
 
   <!-- TABS -->
   <div class="tabs">
-    <button class="tab" [class.active]="activeTab==='toutes'"
-            (click)="activeTab='toutes'">Toutes</button>
-    <button class="tab" [class.active]="activeTab==='en_attente'"
-            (click)="activeTab='en_attente'">En attente</button>
-    <button class="tab" [class.active]="activeTab==='payee'"
-            (click)="activeTab='payee'">Payées</button>
-    <button class="tab" [class.active]="activeTab==='en_retard'"
-            (click)="activeTab='en_retard'">En retard</button>
+    <button class="tab" [class.active]="activeTab==='toutes'"      (click)="activeTab='toutes'">Toutes</button>
+    <button class="tab" [class.active]="activeTab==='en_attente'"  (click)="activeTab='en_attente'">En attente</button>
+    <button class="tab" [class.active]="activeTab==='payee'"       (click)="activeTab='payee'">Payées</button>
+    <button class="tab" [class.active]="activeTab==='en_retard'"   (click)="activeTab='en_retard'">En retard</button>
   </div>
 
   <!-- TABLE -->
   <div class="table-wrapper">
     <table class="factures-table">
       <thead>
-
         <tr>
           <th>Locataire</th>
           <th>Appartement</th>
           <th>Type</th>
-          <th>Date</th>
           <th>Période</th>
-          <th>Délai</th>
+          <th>Date limite</th>
           <th>Montant</th>
           <th>Statut</th>
           <th>Actions</th>
         </tr>
       </thead>
-
       <tbody>
         <tr *ngFor="let f of filtered()">
           <td class="td-name">{{ f.tenant_name || '—' }}</td>
@@ -82,28 +71,24 @@
           <td>
             <span class="type-badge">{{ typeIcon(f.type) }} {{ f.type }}</span>
           </td>
-
-          <td>{{ f.date_facture }}</td>
-          <td>{{ f.periode_consommation || '—' }}</td>
-          <td>{{ f.date_delai || '—' }}</td>
-{{ f.montant | number }} Dt
+          <td class="td-muted">{{ f.periode_consommation || '—' }}</td>
+          <td class="td-muted">{{ f.date_delai || '—' }}</td>
+          <td class="td-montant">{{ f.montant | number }} DT</td>
           <td>
-  <label for="status-{{f.id}}" class="sr-only">Statut de la facture</label>
-    <select id="status-{{f.id}}"
-            class="status-select" 
-            name="status"
-            [(ngModel)]="f.status" 
-            (change)="updateStatus(f.id, f.status)"
-            aria-label="Statut de la facture {{f.id}}">
-              <option value="en_attente">En attente</option>
-              <option value="payee">Payée</option>
-              <option value="en_retard">En retard</option>
-            </select>
+            <span class="status-badge" [ngClass]="f.status">
+              {{ statusLabel(f.status) }}
+            </span>
           </td>
-
           <td>
             <div class="row-actions">
-              <button class="btn-icon" title="Voir">👁</button>
+              <!-- Changer statut -->
+              <select class="status-select"
+                      [value]="f.status"
+                      (change)="updateStatus(f.id, $any($event.target).value)">
+                <option value="en_attente">En attente</option>
+                <option value="payee">Payée</option>
+                <option value="en_retard">En retard</option>
+              </select>
               <button class="btn-icon del" (click)="delete(f.id)" title="Supprimer">🗑️</button>
             </div>
           </td>
@@ -111,101 +96,85 @@
       </tbody>
     </table>
 
-
     <div class="empty" *ngIf="filtered().length === 0">
       Aucune facture trouvée.
     </div>
   </div>
 
-  <!-- Modal Ajouter Facture -->
+  <!-- ══ MODAL AJOUT FACTURE — SIMPLIFIÉ ══════════════════════════════════ -->
   <div class="modal-overlay" *ngIf="showAddModal" (click)="showAddModal = false">
-    <div class="modal add-facture-modal" (click)="$event.stopPropagation(); $event.preventDefault()">
-      <h3>➕ Ajouter une facture</h3>
-      <div *ngIf="noApartments" class="warning">⚠️ Ajoutez d'abord un appartement via l'onglet Appartements.</div>
-      <div class="form-grid">
+    <div class="modal" (click)="$event.stopPropagation()">
+
+      <h3>+ Nouvelle Facture</h3>
+
+      <!--
+        SIMPLIFIÉ : seulement le contrat à choisir
+        Le contrat contient déjà l'appartement et le locataire
+        → plus besoin de liste d'appartements séparée
+      -->
+      <div class="field">
+        <label>Contrat <span class="required">*</span></label>
+        <select [(ngModel)]="addForm.contract_id">
+          <option value="">-- Sélectionner un contrat --</option>
+          <option *ngFor="let c of contracts" [value]="c.id">
+            {{ contractLabel(c) }}
+          </option>
+        </select>
+        <small class="field-note" *ngIf="contracts.length === 0">
+          ⚠️ Aucun contrat disponible — créez d'abord un contrat.
+        </small>
+      </div>
+
+      <!-- TYPE -->
+      <div class="fields-row">
         <div class="field">
-          <label for="add-apartment_id">Appartement</label>
-          <select id="add-apartment_id"
-                  name="apartment_id"
-                  [(ngModel)]="addForm.apartment_id" 
-                  (change)="onApartmentChange()">
-            <option value="">-- Sélectionner --</option>
-            <option *ngFor="let a of apartments" [value]="a.id">
-              {{ a.nom }} ({{ a.etage }}e étage)
-            </option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="add-contract_id">Contrat</label>
-          <select id="add-contract_id"
-                  name="contract_id"
-                  [(ngModel)]="addForm.contract_id" 
-                  [disabled]="contracts.length === 0">
-            <option value="">-- Aucun contrat disponible --</option>
-            <option *ngFor="let c of contracts" [value]="c.id">
-              {{ c.date_debut }} - {{ c.date_fin }} ({{ c.status }})
-            </option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="add-type">Type</label>
-          <select id="add-type"
-                  name="type"
-                  [(ngModel)]="addForm.type">
-            <option value="eau">💧 Eau</option>
-            <option value="gaz">🔥 Gaz</option>
-            <option value="electricite">💡 Électricité</option>
+          <label>Type <span class="required">*</span></label>
+          <select [(ngModel)]="addForm.type">
             <option value="loyer">🏠 Loyer</option>
+            <option value="electricite">💡 Électricité</option>
+            <option value="eau">💧 Eau</option>
             <option value="charges">🔧 Charges</option>
-            <option value="autre">Autre...</option>
+            <option value="autre">📄 Autre</option>
           </select>
         </div>
         <div class="field" *ngIf="addForm.type === 'autre'">
-          <label for="add-customType">Type personnalisé</label>
-          <input id="add-customType"
-                 name="customType"
-                 [(ngModel)]="addForm.customType" 
-                 placeholder="Ex: Internet">
-        </div>
-        <div class="field">
-          <label for="add-montant">Montant (Dt)</label>
-          <input id="add-montant"
-                 type="number" 
-                 name="montant"
-                 [(ngModel)]="addForm.montant" 
-                 min="0" 
-                 step="0.01">
-        </div>
-        <div class="field">
-          <label for="add-periode_start">Période consommation</label>
-          <div style="display: flex; gap: 10px;">
-            <input id="add-periode_start"
-                   name="periode_start"
-                   type="date"
-                   [(ngModel)]="addForm.periode_start">
-            <span>→</span>
-            <input id="add-periode_end"
-                   name="periode_end"
-                   type="date"
-                   [(ngModel)]="addForm.periode_end">
-          </div>
-        </div>
-        <div class="field">
-          <label for="add-date_delai">Date délai</label>
-          <input id="add-date_delai"
-                 type="date"
-                 name="date_delai"
-                 [(ngModel)]="addForm.date_delai">
+          <label>Préciser le type</label>
+          <input [(ngModel)]="addForm.customType" placeholder="Ex: Internet" />
         </div>
       </div>
+
+      <!-- MONTANT -->
+      <div class="field">
+        <label>Montant (DT) <span class="required">*</span></label>
+        <input type="number"
+               [(ngModel)]="addForm.montant"
+               placeholder="1200"
+               min="0" />
+      </div>
+
+      <!-- PÉRIODE DE CONSOMMATION -->
+      <div class="field">
+        <!-- REPLACE the single periode_consommation input with: -->
+<label>Période de consommation</label>
+<div style="display:flex; gap:10px; align-items:center;">
+  <input type="date" [(ngModel)]="addForm.periode_debut" style="flex:1" />
+  <span>→</span>
+  <input type="date" [(ngModel)]="addForm.periode_fin" style="flex:1" />
+</div>
+      </div>
+
+      <!-- DATE DÉLAI -->
+      <div class="field">
+        <label>Date limite de paiement <span class="required">*</span></label>
+        <input type="date" [(ngModel)]="addForm.date_delai" />
+      </div>
+
       <div class="modal-actions">
-        <button class="btn-cancel" (click)="showAddModal = false; resetAddForm()">Annuler</button>
-        <button class="btn-save" (click)="addFacture()" [disabled]="!addForm.contract_id || !addForm.montant">
-          Ajouter facture
-        </button>
+        <button class="btn-cancel" (click)="showAddModal = false">Annuler</button>
+        <button class="btn-save"   (click)="addFacture()">Ajouter la facture</button>
       </div>
+
     </div>
   </div>
 
 </div>
-

@@ -13,12 +13,21 @@
   color: var(--navy);
 }
 
-/* Enhanced + Ajouter Button */
+
 .btn-add {
-  @extend .btn, .btn-primary;
-  padding: 16px 32px;
-  font-size: 16px;
+  background: var(--gold);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 22px;
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s;
 }
+.btn-add:hover { background: var(--gold-hover); }
 
 .warning {
   background: #fef3c7;

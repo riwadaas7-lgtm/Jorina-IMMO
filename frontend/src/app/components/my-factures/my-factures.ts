@@ -18,13 +18,9 @@ export class MyFacturesComponent implements OnInit {
   constructor(private api: ApiService) {}
 
   ngOnInit() {
-    this.api.getContracts().subscribe((contracts: any[]) => {
-      const myContract = contracts.find(c => c.tenant_id === this.user.id);
-      if (myContract) {
-        this.api.getFactures().subscribe((res: any[]) => {
-          this.factures = res.filter(f => f.contract_id === myContract.id);
-        });
-      }
+    this.api.getFacturesForUser(this.user.id).subscribe({
+      next:  (res: any[]) => this.factures = res,
+      error: ()           => this.factures = []
     });
   }
 

@@ -50,6 +50,9 @@
             <h3>{{ d.nom }}</h3>
             <p class="ville">{{ d.ville }}</p>
           </div>
+          <span class="tf-badge" *ngIf="d.titre_foncier">
+            📋 {{ d.titre_foncier }}
+          </span>
         </div>
 
         <div class="dept-stats one-col">
@@ -93,6 +96,15 @@
         <label>Nom</label>
         <input [(ngModel)]="editingNom" />
       </div>
+      <div class="field">
+      <label>
+        Numéro de titre foncier
+        <span class="field-hint">— identifiant légal unique</span>
+      </label>
+      <input [(ngModel)]="editingTitreFoncier"
+             placeholder="Ex: TF-12345-TUNIS"
+             class="tf-input" />
+    </div>
       <div class="field">
         <label>Ville</label>
         <input [(ngModel)]="editingVille" />
@@ -168,6 +180,18 @@
         <label>Nom</label>
         <input [(ngModel)]="nom" placeholder="Residence Les Oliviers" />
       </div>
+      <div class="field">
+      <label>
+        Numéro de titre foncier
+        <span class="field-hint">— identifiant légal unique</span>
+      </label>
+      <input [(ngModel)]="titre_foncier"
+             placeholder="Ex: TF-12345-TUNIS"
+             class="tf-input" />
+      <small class="field-note">
+        Ce numéro doit être unique — il identifie légalement la propriété
+      </small>
+    </div>
       <div class="field">
         <label>Ville</label>
         <input [(ngModel)]="ville" placeholder="Paris" />

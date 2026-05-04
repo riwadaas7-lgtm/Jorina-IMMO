@@ -12,47 +12,46 @@ import { MyContractComponent }      from './components/my-contract/my-contract';
 import { MyFacturesComponent }      from './components/my-factures/my-factures';
 import { MyPaymentsComponent }      from './components/my-payments/my-payments';
 import { MyNotificationsComponent } from './components/my-notifications/my-notifications';
+import { ChatComponent }            from './components/chat/chat';   // ✅ NOUVEAU
 import { AuthGuard }                from './auth.guard';
 import { GuestGuard }               from './guest.guard';
+import { RoleGuard }                from './role.guard';
 import { LoginComponent }           from './components/login/login';
 import { RegisterComponent }        from './components/register/register';
 
 export const routes: Routes = [
-  // Si URL vide → aller sur login
   { path: '', pathMatch: 'full', redirectTo: 'login' },
 
-  // Pages publiques (pas besoin d'être connecté), protégée par GuestGuard
   { path: 'login',    component: LoginComponent,    canActivate: [GuestGuard] },
   { path: 'register', component: RegisterComponent, canActivate: [GuestGuard] },
 
-  // Pages protégées (AuthGuard vérifie le token)
   {
     path: '',
-    component: LayoutComponent,     // sidebar + topbar communs
+    component: LayoutComponent,
     canActivate: [AuthGuard],
     children: [
 
-      // ── PROPRIÉTAIRE ──────────────────────────
-      { path: 'departments',   component: DepartmentsComponent },
-      { path: 'apartments',    component: ApartmentsComponent },
-      { path: 'users',         component: UsersComponent },
-      { path: 'contracts',     component: ContractsComponent },
-      { path: 'factures',      component: FacturesComponent },
-      { path: 'invitations',   component: InvitationsComponent },
-      { path: 'notifications', component: NotificationsComponent },
+      // ── PROPRIÉTAIRE ──────────────────────────────────────────
+      { path: 'departments',  component: DepartmentsComponent,  canActivate: [RoleGuard], data: { role: 'proprietaire' } },
+      { path: 'apartments',   component: ApartmentsComponent,   canActivate: [RoleGuard], data: { role: 'proprietaire' } },
+      { path: 'users',        component: UsersComponent,        canActivate: [RoleGuard], data: { role: 'proprietaire' } },
+      { path: 'contracts',    component: ContractsComponent,    canActivate: [RoleGuard], data: { role: 'proprietaire' } },
+      { path: 'factures',     component: FacturesComponent,     canActivate: [RoleGuard], data: { role: 'proprietaire' } },
+      { path: 'invitations',  component: InvitationsComponent,  canActivate: [RoleGuard], data: { role: 'proprietaire' } },
+      { path: 'notifications',component: NotificationsComponent,canActivate: [RoleGuard], data: { role: 'proprietaire' } },
+      // ── LOCATAIRE ─────────────────────────────────────────────
+      { path: 'my-apartment',     component: MyApartmentComponent,     canActivate: [RoleGuard], data: { role: 'locataire' } },
+      { path: 'my-contract',      component: MyContractComponent,      canActivate: [RoleGuard], data: { role: 'locataire' } },
+      { path: 'my-factures',      component: MyFacturesComponent,      canActivate: [RoleGuard], data: { role: 'locataire' } },
+      { path: 'my-payments',      component: MyPaymentsComponent,      canActivate: [RoleGuard], data: { role: 'locataire' } },
+      { path: 'my-notifications', component: MyNotificationsComponent, canActivate: [RoleGuard], data: { role: 'locataire' } },
 
-      // ── LOCATAIRE ─────────────────────────────
-      { path: 'my-apartment',     component: MyApartmentComponent },
-      { path: 'my-contract',      component: MyContractComponent },
-      { path: 'my-factures',      component: MyFacturesComponent },
-      { path: 'my-payments',      component: MyPaymentsComponent },      // Coming Soon
-      { path: 'my-notifications', component: MyNotificationsComponent },
+      // ── CHAT — accessible aux deux rôles ──────────────────────
+      { path: 'chat', component: ChatComponent },   // ✅ NOUVEAU
 
-      // Par défaut → departments
       { path: '', redirectTo: 'departments', pathMatch: 'full' }
     ]
   },
 
-  // URL inconnue → login
   { path: '**', redirectTo: 'login' }
 ];

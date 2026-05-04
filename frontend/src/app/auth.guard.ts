@@ -6,10 +6,10 @@ export const AuthGuard: CanActivateFn = () => {
   const token = localStorage.getItem('token'); // cherche le token
 
   if (!token) {
-    // Pas de token = pas connecté → redirige vers login
+    // Pas de token = pas connecte → redirige vers login
     inject(Router).navigate(['/login']);
     return false;
   }
 
-  return true; // token présent = accès autorisé
+  return true; // token present = acces autorise
 };

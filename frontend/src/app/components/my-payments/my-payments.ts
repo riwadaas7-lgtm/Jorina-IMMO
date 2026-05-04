@@ -9,5 +9,4 @@ import { CommonModule } from '@angular/common';
   styleUrl: './my-payments.css'
 })
 export class MyPaymentsComponent {
-  // Interface Coming Soon — pas de fonctionnalité pour l'instant
 }

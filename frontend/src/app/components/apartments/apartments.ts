@@ -21,21 +21,25 @@ export class ApartmentsComponent implements OnInit {
   activeTab  = 'tous';
   searchTerm = '';
 
-  // Formulaire partagé add/edit
-  form = { nom: '', etage: 0, price: 0, description: '', department_id: '', status: 'libre', photo: '' };
+  // Formulaire add/edit
+  form = {
+  nom: '', etage: 0, price: 0,
+  description: '', department_id: '',
+  status: 'libre', photo: '', maintenance: 0
+ };
 
   constructor(private api: ApiService) {}
 
   ngOnInit() {
     this.loadApartments();
-    this.api.getDepartments().subscribe(res => this.departments = res);
+    this.api.getDepartments(this.user.id).subscribe(res => this.departments = res);
   }
 
   loadApartments() {
     this.api.getApartments(this.user.id).subscribe(res => this.apartments = res);
   }
 
-  // ✅ Compte les appartements par statut (pour les cartes stats)
+  //  Compte les appartements par statut (pour les cartes stats)
   countByStatus(s: string) {
     return this.apartments.filter(a => a.status === s).length;
   }
@@ -45,7 +49,7 @@ export class ApartmentsComponent implements OnInit {
     return map[s] || s;
   }
 
-  // ✅ Filtre selon l'onglet actif et la recherche
+  //  Filtre selon l'onglet actif et la recherche
   filtered() {
     return this.apartments.filter(a => {
       const matchTab    = this.activeTab === 'tous' || a.status === this.activeTab;
@@ -66,29 +70,62 @@ export class ApartmentsComponent implements OnInit {
   }
 
   delete(id: number) {
-    if (!confirm('Supprimer cet appartement ?')) return;
-    this.api.deleteApartment(id).subscribe(() => this.loadApartments());
+  const apt = this.apartments.find(a => a.id === id);
+  if (apt?.status === 'occupe') {
+    alert('Impossible de supprimer un appartement occupé. Libérez-le d\'abord depuis la page Locataires.');
+    return;
   }
+  if (!confirm('Supprimer cet appartement ?')) return;
+  this.api.deleteApartment(id).subscribe({
+    next: () => this.loadApartments(),
+    error: (err: any) => alert(err.error?.detail || 'Erreur suppression')
+  });
+}
 
   startEdit(a: any) {
-    this.editingId = a.id;
-    this.form = { nom: a.nom, etage: a.etage, price: a.price,
-                  description: a.description, department_id: a.department_id,
-                  status: a.status, photo: a.photo || '' };
-  }
+  this.editingId = a.id;
+  this.form = {
+    nom: a.nom, etage: a.etage, price: a.price,
+    description: a.description, department_id: a.department_id,
+    status: a.status, photo: a.photo || '',
+    maintenance: a.maintenance || 0
+  };
+}
 
   cancelEdit() { this.editingId = null; this.resetForm(); }
 
   saveEdit() {
-    if (this.editingId === null) return;
-    this.api.updateApartment(this.editingId, this.form).subscribe(() => {
-      this.editingId = null;
-      this.resetForm();
-      this.loadApartments();
-    });
+  if (this.editingId === null) return;
+
+  const current = this.apartments.find(a => a.id === this.editingId);
+  if (current?.status === 'occupe' && this.form.status === 'libre') {
+    alert('⚠️ Impossible de libérer manuellement un appartement occupé.\n\nAllez dans la page Locataires et utilisez le bouton "Libérer l\'appartement" ou terminez le contrat depuis la page Contrats.');
+    return;
   }
 
-  // ✅ Upload photo appartement
+  this.api.updateApartment(this.editingId, this.form).subscribe({
+    next: () => { this.editingId = null; this.resetForm(); this.loadApartments(); },
+    error: (err: any) => alert(err.error?.detail || 'Erreur modification')
+  });
+}
+  toggleMaintenance(a: any) {
+  const newVal = a.maintenance ? 0 : 1;
+  const msg = newVal
+    ? `Mettre ${a.nom} en maintenance ?`
+    : `Retirer ${a.nom} de la maintenance ?`;
+  if (!confirm(msg)) return;
+
+  this.api.updateApartment(a.id, {
+    ...a,
+    maintenance:   newVal,
+    department_id: a.department_id
+  }).subscribe({
+    next: () => this.loadApartments(),
+    error: (err: any) => alert(err.error?.detail || 'Erreur')
+  });
+}
+
+  //  Upload photo appartement
   onSelectPhoto(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
@@ -96,6 +133,6 @@ export class ApartmentsComponent implements OnInit {
   }
 
   resetForm() {
-    this.form = { nom: '', etage: 0, price: 0, description: '', department_id: '', status: 'libre', photo: '' };
+    this.form = { nom: '', etage: 0, price: 0, description: '', department_id: '', status: 'libre', photo: '', maintenance: 0 };
   }
 }

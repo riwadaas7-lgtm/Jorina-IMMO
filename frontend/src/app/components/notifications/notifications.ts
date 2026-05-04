@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { WebSocketService } from '../../services/websocket.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-notifications',
@@ -8,61 +10,76 @@ import { CommonModule } from '@angular/common';
   templateUrl: './notifications.html',
   styleUrl: './notifications.css'
 })
-export class NotificationsComponent {
+export class NotificationsComponent implements OnInit, OnDestroy {
 
-  notifications = [
-    {
-      type: 'danger',
-      title: 'Paiement en retard',
-      description: 'Le loyer de Mars 2026 n\'a pas été reçu',
-      time: 'Il y a 2 heures',
-      read: false
-    },
-    {
-      type: 'success',
-      title: 'Paiement confirmé',
-      description: 'Paiement de 1,200€ reçu de Marie Dubois',
-      time: 'Il y a 5 heures',
-      read: false
-    },
-    {
-      type: 'info',
-      title: 'Nouveau contrat',
-      description: 'Contrat signé pour l\'appartement A102',
-      time: 'Il y a 1 jour',
-      read: true
-    },
-    {
-      type: 'warning',
-      title: 'Contrat à renouveler',
-      description: 'Le contrat de Pierre Martin expire dans 30 jours',
-      time: 'Il y a 2 jours',
-      read: true
-    },
-    {
-      type: 'info',
-      title: 'Nouveau locataire',
-      description: 'Sophie Bernard a rejoint l\'appartement B205',
-      time: 'Il y a 3 jours',
-      read: true
+  notifications: any[] = this.loadFromStorage();
+  private wsSub: Subscription | null = null;
+
+  constructor(private ws: WebSocketService) {}
+
+  // notifications.ts AND my-notifications.ts — same change for both
+
+ngOnInit() {
+  // Reload from storage every time we navigate to this page
+  this.notifications = this.loadFromStorage();
+
+  // Still subscribe to catch notifications received WHILE on this page
+  this.wsSub = this.ws.messages$.subscribe((msg: any) => {
+    if (msg.type === 'notification') {
+      // Layout already saved to storage, just reload
+      this.notifications = this.loadFromStorage();
     }
-  ];
+  });
+}
+
+  ngOnDestroy() {
+    if (this.wsSub) this.wsSub.unsubscribe();
+  }
+
+  private loadFromStorage(): any[] {
+    try {
+      const stored = localStorage.getItem('notifications_proprietaire');
+      return stored ? JSON.parse(stored) : this.defaultNotif();
+    } catch {
+      return this.defaultNotif();
+    }
+  }
+
+  private saveToStorage() {
+    localStorage.setItem('notifications_proprietaire', JSON.stringify(this.notifications));
+  }
+
+  private defaultNotif() {
+    return [{
+      type:        'info',
+      title:       'Bienvenue sur JORILINA IMMO',
+      description: 'Les nouvelles notifications apparaîtront ici en temps réel',
+      time:        'Maintenant',
+      read:        false
+    }];
+  }
 
   typeIcon(type: string) {
-    const map: any = {
-      danger:  '🔴',
-      success: '✅',
-      info:    '📄',
-      warning: '⚠️'
-    };
+    const map: any = { danger: '🔴', success: '✅', info: '📄', warning: '⚠️' };
     return map[type] || '🔔';
   }
 
-  unreadCount() {
-    return this.notifications.filter(n => !n.read).length;
+  unreadCount()  { return this.notifications.filter(n => !n.read).length; }
+
+  markRead(n: any) {
+    n.read = true;
+    this.saveToStorage();
   }
 
   markAllRead() {
     this.notifications.forEach(n => n.read = true);
+    this.saveToStorage();
+  }
+
+  clearAll() {
+    if (confirm('Effacer toutes les notifications ?')) {
+      this.notifications = [];
+      this.saveToStorage();
+    }
   }
 }

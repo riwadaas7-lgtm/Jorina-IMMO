@@ -2,6 +2,7 @@
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../services/api';
+import { error } from 'console';
 
 @Component({
   selector: 'app-departments',
@@ -15,19 +16,13 @@ export class DepartmentsComponent implements OnInit {
   // Utilisateur connecte
   user    = JSON.parse(localStorage.getItem('user') || '{}');
   isOwner = this.user?.role === 'proprietaire';
-
-  // Donnees
   departments: any[] = [];
   apartments:  any[] = [];
-
-  //  Pour le skeleton loader 
   isLoading    = false;
   loadError    = '';
   skeletonCards = Array.from({ length: 6 }); 
-
-  // Formulaire ajout departement
   showAddModal = false;
-  nom = ''; ville = ''; code_postal = ''; address = ''; photo = '';
+  nom = ''; ville = ''; code_postal = ''; address = ''; photo = ''; titre_foncier = '';
 
   // Formulaire modification departement
   editingId         = null as number | null;
@@ -36,6 +31,7 @@ export class DepartmentsComponent implements OnInit {
   editingCodePostal = '';
   editingAddress    = '';
   editingPhoto      = '';
+  editingTitreFoncier = '';
 
   // Formulaire ajout appartement dans un departement
   apartmentNom         = '';
@@ -83,7 +79,7 @@ export class DepartmentsComponent implements OnInit {
 
   //  Charge tous les appartements
   loadApartments() {
-    this.api.getAllApartments().subscribe({
+    this.api.getAllApartments(this.user.id).subscribe({
       next:  (res) => this.apartments = res,
       error: ()    => this.apartments = []
     });
@@ -113,21 +109,28 @@ export class DepartmentsComponent implements OnInit {
 
   // Ajoute un nouveau dpartement
   add() {
-    if (!this.nom || !this.ville) return;
+  if (!this.nom || !this.ville) return;
 
-    this.api.addDepartment({
-      nom: this.nom, ville: this.ville,
-      code_postal: this.code_postal,
-      address: this.address, photo: this.photo,
-      owner_id:    this.user.id
-    }).subscribe(() => {
-      // Reinitialise le form
+  this.api.addDepartment({
+    nom:           this.nom,
+    ville:         this.ville,
+    code_postal:   this.code_postal,
+    address:       this.address,
+    photo:         this.photo,
+    titre_foncier: this.titre_foncier,
+    owner_id:      this.user.id
+  }).subscribe({
+    next: () => {
       this.nom = ''; this.ville = ''; this.code_postal = '';
-      this.address = ''; this.photo = '';
+      this.address = ''; this.photo = ''; this.titre_foncier = '';
       this.showAddModal = false;
       this.loadDepartments();
-    });
-  }
+    },
+    error: (err: any) => {
+      alert('⚠️ ' + (err.error?.detail || 'Erreur lors de l\'ajout'));
+    }
+  });
+}
 
   // Supprime un departement
   delete(id: number) {
@@ -147,6 +150,7 @@ export class DepartmentsComponent implements OnInit {
     this.editingCodePostal = d.code_postal;
     this.editingAddress    = d.address;
     this.editingPhoto      = d.photo || '';
+    this.editingTitreFoncier = d.titre_foncier;
     d.showMenu             = false;
   }
 
@@ -154,18 +158,21 @@ export class DepartmentsComponent implements OnInit {
 
   //Sauvegarde les modifications du departement
   saveEdit() {
-    if (this.editingId === null) return;
-    this.api.updateDepartment(this.editingId, {
-      nom:         this.editingNom,
-      ville:       this.editingVille,
-      code_postal: this.editingCodePostal,
-      address:     this.editingAddress,
-      photo:       this.editingPhoto
-    }).subscribe(() => {
-      this.editingId = null;
-      this.loadDepartments();
-    });
-  }
+  if (this.editingId === null) return;
+  this.api.updateDepartment(this.editingId, {
+    nom:           this.editingNom,
+    ville:         this.editingVille,
+    code_postal:   this.editingCodePostal,
+    address:       this.editingAddress,
+    photo:         this.editingPhoto,
+    titre_foncier: this.editingTitreFoncier
+  }).subscribe({
+    next: () => { this.editingId = null; this.loadDepartments(); },
+    error: (err: any) => {
+      alert('⚠️ ' + (err.error?.detail || 'Erreur lors de la modification'));
+    }
+  });
+}
 
   // Upload photo pour departement (editing = true → modal modification)
   onSelectDepartmentPhoto(event: Event, editing = false) {

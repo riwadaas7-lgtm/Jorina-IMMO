@@ -20,14 +20,15 @@
   </div>
 
   <div class="tabs">
-    <button class="tab" [class.active]="activeTab === 'tous'" (click)="activeTab = 'tous'">Tous</button>
-    <button class="tab" [class.active]="activeTab === 'actif'" (click)="activeTab = 'actif'">Actifs</button>
-    <button class="tab" [class.active]="activeTab === 'retard'" (click)="activeTab = 'retard'">En retard</button>
-    <button class="tab" [class.active]="activeTab === 'ancien'" (click)="activeTab = 'ancien'">Anciens</button>
-  </div>
+  <button class="tab" [class.active]="activeTab === 'tous'"   (click)="activeTab = 'tous'">Tous</button>
+  <button class="tab" [class.active]="activeTab === 'actif'"  (click)="activeTab = 'actif'">Actifs</button>
+  <button class="tab" [class.active]="activeTab === 'ancien'" (click)="activeTab = 'ancien'">
+    Anciens <span *ngIf="countAnciens() > 0" class="badge-count">{{ countAnciens() }}</span>
+  </button>
+</div>
 
   <div class="users-grid">
-    <div class="user-card" *ngFor="let u of filtered()">
+    <div class="user-card" [class.ancien]="u.statut === 'ancien'" *ngFor="let u of filtered()">
       <div class="card-top">
         <div class="user-left">
           <div class="avatar-circle">{{ initials(u) }}</div>
@@ -37,71 +38,245 @@
           </div>
         </div>
         <span class="status-badge" [ngClass]="u.statut || 'actif'">{{ statusLabel(u.statut || 'actif') }}</span>
+        <div class="ancien-banner" *ngIf="u.statut === 'ancien'">
+  📦 Ancien locataire — sans appartement
+</div>
       </div>
 
       <div class="card-details">
         <div class="detail-row"><span class="detail-icon">🔍</span><span>{{ u.apartment_nom || 'Appartement non assigne' }}</span></div>
-        <div class="detail-row"><span class="detail-icon">📍</span><span>{{ u.ville || '-' }}</span></div>
         <div class="detail-row"><span class="detail-icon">✉️</span><span>{{ u.email }}</span></div>
         <div class="detail-row"><span class="detail-icon">📞</span><span>{{ u.telephone || '-' }}</span></div>
 
-        <div class="tenant-code-wrap">
-          <div class="tenant-code-text">
-            <strong>Code locataire:</strong> {{ u.tenant_code || '-' }}
-          </div>
-          <img class="tenant-qr" [src]="u.qr_url" [alt]="'QR ' + (u.tenant_code || '')" />
-        </div>
-      </div>
-
-      <div class="card-footer">
-        <div>
-          <p class="loyer-label">Loyer mensuel</p>
-          <p class="loyer-value">{{ u.loyer || 0 | number }} DT</p>
-        </div>
         <div class="contact-actions">
-          <button class="contact-btn" title="Envoyer un email">✉️</button>
-          <button class="contact-btn" title="Appeler">📞</button>
-        </div>
+  <a [href]="'mailto:' + u.email" class="contact-btn" title="Envoyer un email">✉️</a>
+  <a [href]="'tel:' + u.telephone" class="contact-btn" title="Appeler">📞</a>
+</div>
       </div>
+      
+      <div class="card-footer">
+  <div>
+    <p class="loyer-label">Loyer mensuel</p>
+    <p class="loyer-value">{{ u.loyer | number }} DT</p>
+  </div>
+  
+</div>
+<div class="card-actions">
+  <button class="btn-icon edit" (click)="edit(u)">✏️</button>
+  <button class="btn-icon del" (click)="delete(u)">🗑️</button>
+
+</div>
     </div>
   </div>
 
   <div class="empty" *ngIf="filtered().length === 0">Aucun locataire trouve.</div>
 
-  <div class="modal-overlay" *ngIf="showAddModal" (click)="showAddModal = false">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <h3>Ajouter un Locataire</h3>
+  <!-- MODAL AJOUT LOCATAIRE -->
+<div class="modal-overlay" *ngIf="showAddModal" (click)="showAddModal = false">
+  <div class="modal" (click)="$event.stopPropagation()">
 
-      <div class="fields-row">
-        <div class="field">
-          <label>Nom</label>
-          <input [(ngModel)]="form.nom" placeholder="Dupont" />
-        </div>
-        <div class="field">
-          <label>Prenom</label>
-          <input [(ngModel)]="form.prenom" placeholder="Marie" />
-        </div>
+    <h3>Ajouter un Locataire</h3>
+
+    <!-- ÉTAPE 1 — CIN -->
+    <div class="field">
+      <label>CIN du locataire <span class="required">*</span></label>
+      <div class="cin-row">
+        <input type="text"
+               [(ngModel)]="form.cin"
+               placeholder="Ex: 12345678"
+               (blur)="searchByCin()" />
+        <button class="btn-search" (click)="searchByCin()" [disabled]="!form.cin">
+          🔍 Rechercher
+        </button>
       </div>
+    </div>
 
+    <!-- MESSAGE LOCATAIRE TROUVÉ -->
+    <div class="found-banner" *ngIf="cinSearchDone && existingUser">
+      ✅ Locataire trouvé : <strong>{{ existingUser.prenom }} {{ existingUser.nom }}</strong>
+      — Les champs sont pré-remplis
+    </div>
+
+    <!-- MESSAGE NON TROUVÉ -->
+    <div class="notfound-banner" *ngIf="cinSearchDone && !existingUser">
+      ℹ️ Nouveau locataire — remplissez les informations
+    </div>
+
+    <!-- CHAMPS (remplis automatiquement si CIN trouvé) -->
+    <div class="fields-row">
       <div class="field">
-        <label>Email</label>
-        <input type="email" [(ngModel)]="form.email" placeholder="marie@email.com" />
+        <label>Nom <span class="required">*</span></label>
+        <input type="text"
+               [(ngModel)]="form.nom"
+               placeholder="Dupont"
+               [readonly]="!!existingUser" />
       </div>
-
       <div class="field">
-        <label>Telephone</label>
-        <input [(ngModel)]="form.telephone" placeholder="+21612345678" />
+        <label>Prénom <span class="required">*</span></label>
+        <input type="text"
+               [(ngModel)]="form.prenom"
+               placeholder="Marie"
+               [readonly]="!!existingUser" />
       </div>
+    </div>
 
+    <div class="field">
+      <label>Email <span class="required">*</span></label>
+      <input type="email"
+             [(ngModel)]="form.email"
+             placeholder="marie@email.com"
+             [readonly]="!!existingUser" />
+    </div>
+
+    <div class="field">
+      <label>Téléphone</label>
+      <input type="text"
+             [(ngModel)]="form.telephone"
+             placeholder="06 12 34 56 78"
+             [readonly]="!!existingUser" />
+    </div>
+
+    <!-- APPARTEMENT À ASSIGNER -->
+    <div class="field">
+      <label>Appartement à assigner <span class="required">*</span></label>
+      <select [(ngModel)]="form.apartment_id">
+        <option value="">-- Choisir un appartement libre --</option>
+        <option *ngFor="let a of freeApartments" [value]="a.id">
+          {{ a.nom }} — {{ a.price }}€/mois
+        </option>
+      </select>
+    </div>
+
+    
+
+    <div class="error-msg" *ngIf="addError">{{ addError }}</div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="showAddModal = false">Annuler</button>
+      <button class="btn-save" (click)="add()" [disabled]="addLoading">
+        {{ addLoading ? 'En cours...' : 'Ajouter' }}
+      </button>
+    </div>
+
+  </div>
+ </div>
+</div>
+
+<!-- MODAL MODIFICATION LOCATAIRE -->
+<div class="modal-overlay" *ngIf="showEditModal" (click)="showEditModal = false">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h3>✏️ Modifier le Locataire</h3>
+
+    <div class="fields-row">
       <div class="field">
-        <label>Mot de passe</label>
-        <input type="password" [(ngModel)]="form.password" placeholder="********" />
+        <label>Nom</label>
+        <input type="text" [(ngModel)]="editForm.nom" />
       </div>
+      <div class="field">
+        <label>Prénom</label>
+        <input type="text" [(ngModel)]="editForm.prenom" />
+      </div>
+    </div>
 
-      <div class="modal-actions">
-        <button class="btn-cancel" (click)="showAddModal = false">Annuler</button>
-        <button class="btn-save" (click)="add()">Ajouter</button>
-      </div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" [(ngModel)]="editForm.email" />
+    </div>
+
+    <div class="field">
+      <label>Téléphone</label>
+      <input type="text" [(ngModel)]="editForm.telephone" />
+    </div>
+
+    <div class="field" *ngIf="editingUser?.statut !== 'ancien'">
+      <label>Changer d'appartement</label>
+      <select [(ngModel)]="editForm.apartment_id">
+        <option [value]="editingUser?.apartment_id">
+          -- Garder l'appartement actuel --
+        </option>
+        <option *ngFor="let a of freeApartments" [value]="a.id">
+          {{ a.nom }} — {{ a.price }} DT/mois
+        </option>
+      </select>
+    </div>
+
+    <div class="field" *ngIf="editingUser?.statut === 'ancien'">
+      <label>Assigner un appartement</label>
+      <select [(ngModel)]="editForm.apartment_id">
+        <option value="">-- Choisir un appartement libre --</option>
+        <option *ngFor="let a of freeApartments" [value]="a.id">
+          {{ a.nom }} — {{ a.price }} DT/mois
+        </option>
+      </select>
+      <small style="color:#16a34a; font-size:11px">
+        ✅ Le locataire redeviendra actif et recevra un email.
+      </small>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="showEditModal = false">Annuler</button>
+      <button class="btn-save" (click)="saveEdit()">Enregistrer</button>
     </div>
   </div>
 </div>
+
+<!-- MODAL SUPPRESSION LOCATAIRE -->
+<div class="modal-overlay" *ngIf="showDeleteModal" (click)="showDeleteModal = false">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div style="text-align:center; font-size:48px">
+      {{ deletingUser?.statut === 'ancien' ? '🗑️' : '⚠️' }}
+    </div>
+    <h3 style="text-align:center">
+      {{ deletingUser?.statut === 'ancien' ? 'Supprimer l\'ancien locataire ?' : 'Que voulez-vous faire ?' }}
+    </h3>
+
+    <div style="background:#f9fafb; border-radius:10px; padding:14px; margin:12px 0">
+      <p style="font-size:14px; color:#374151; text-align:center">
+        <strong>{{ deletingUser?.prenom }} {{ deletingUser?.nom }}</strong>
+      </p>
+      <p style="font-size:12px; color:#6b7280; text-align:center; margin-top:4px">
+        {{ deletingUser?.email }}
+      </p>
+    </div>
+
+    <!-- Actif locataire options -->
+    <div *ngIf="deletingUser?.statut !== 'ancien'"
+         style="display:flex; flex-direction:column; gap:10px; margin-top:8px">
+
+      <div style="background:#fef3c7; border-radius:10px; padding:12px; font-size:13px; color:#92400e">
+        ⚠️ Ce locataire a un appartement assigné. Choisissez une action :
+      </div>
+
+      <button class="btn-save" style="background:#f59e0b"
+              (click)="confirmDelete('archive')">
+        📦 Archiver — garder ses données, libérer l'appartement
+      </button>
+      <button class="btn-save" style="background:#ef4444"
+              (click)="confirmDelete('permanent')">
+        🗑️ Supprimer définitivement toutes ses données
+      </button>
+      <button class="btn-cancel" (click)="showDeleteModal = false">
+        Annuler
+      </button>
+    </div>
+
+    <!-- Ancien locataire options -->
+    <div *ngIf="deletingUser?.statut === 'ancien'"
+         style="display:flex; flex-direction:column; gap:10px; margin-top:8px">
+
+      <div style="background:#fef2f2; border-radius:10px; padding:12px; font-size:13px; color:#dc2626">
+        🗑️ Supprimer définitivement supprimera ses contrats, factures et messages.
+      </div>
+
+      <button class="btn-save" style="background:#ef4444"
+              (click)="confirmDelete('permanent')">
+        🗑️ Supprimer définitivement
+      </button>
+      <button class="btn-cancel" (click)="showDeleteModal = false">
+        Annuler — garder archivé
+      </button>
+    </div>
+
+  </div>
+</div>
+

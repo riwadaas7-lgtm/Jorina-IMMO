@@ -1,104 +1,99 @@
-<div class="page"> <!-- FORCE SHOW, ignore loading -->
+<div class="page">
 
-  <!-- HEADER -->
-  <div class="page-header-row">
-    <h2 class="page-title">Mon Appartement</h2>
-    <button class="btn-join-classroom" *ngIf="!apartment" (click)="onJoinClick()">+ Rejoindre un appartement</button>
+  <!-- LOADING -->
+  <div class="loading" *ngIf="loading">
+    <div class="spinner"></div>
   </div>
 
-  <!-- ══ PAS D'APPARTEMENT ══ -->
-  <div class="empty-state" *ngIf="!apartment">
-    <div class="empty-icon">🏠</div>
-    <h3>Vous n'avez pas encore d'appartement</h3>
-    <p>Cliquez sur "Rejoindre un appartement" et entrez le code fourni par votre propriétaire.</p>
-  </div>
+  <div *ngIf="!loading">
 
-  <!-- ══ HERO APPARTEMENT ══ -->
-  <div class="apt-hero" *ngIf="apartment">
-    <img [src]="apartment.photo || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200'"
-         [alt]="apartment.nom"
-         class="hero-img" />
-    <div class="hero-overlay">
-      <div class="hero-content">
-        <h2>Mon Appartement</h2>
-        <p class="hero-address">{{ apartment.description || 'Adresse non renseignée' }}</p>
-        <p class="hero-owner">Appartement: {{ apartment.nom }}</p>
-      </div>
-{{ apartment.price | number }} Dt/mois
-    </div>
-  </div>
-
-  <!-- ══ 3 CARTES RÉSUMÉ ══ -->
-  <div class="summary-grid" *ngIf="apartment">
-
-    <div class="summary-card">
-      <div class="summary-icon green">📋</div>
-      <div class="summary-info">
-        <span class="summary-label">Mon Contrat</span>
-        <span class="summary-value">{{ contract ? contract.status : 'Aucun' }}</span>
-        <span class="summary-sub" *ngIf="contract">Expire le {{ contract.date_fin }}</span>
-        <span class="summary-sub" *ngIf="!contract">Pas de contrat actif</span>
-      </div>
+    <!-- HEADER -->
+    <div class="page-header-row">
+      <h2 class="page-title">Mon Appartement</h2>
     </div>
 
-    <div class="summary-card">
-      <div class="summary-icon gold">🧾</div>
-      <div class="summary-info">
-        <span class="summary-label">Mes Factures</span>
-        <span class="summary-value">{{ factures.length }}</span>
-        <span class="summary-sub">{{ pendingFactures }} en attente</span>
+    <!-- ══ CONTRACT EXPIRED BANNER ══ -->
+    <div class="expired-banner" *ngIf="contractExpired">
+      ⚠️ Votre contrat a expiré ou a été terminé. Veuillez contacter votre propriétaire.
+    </div>
+
+    <!-- ══ PAS D'APPARTEMENT ══ -->
+    <div class="empty-state" *ngIf="!apartment">
+      <div class="empty-icon">🏠</div>
+      <h3>Vous n'avez pas encore d'appartement</h3>
+      <p>Votre propriétaire vous assignera un appartement et vous recevrez un email avec vos accès.</p>
+    </div>
+
+    <!-- ══ HERO APPARTEMENT ══ -->
+    <div class="apt-hero" *ngIf="apartment">
+      <img [src]="apartment.photo || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200'"
+           [alt]="apartment.nom"
+           class="hero-img" />
+      <div class="hero-overlay">
+        <div class="hero-content">
+          <h2>{{ apartment.nom }}</h2>
+          <p class="hero-address">{{ apartment.description || 'Description non renseignée' }}</p>
+          <p class="hero-owner" *ngIf="owner">
+            Propriétaire : {{ owner.prenom }} {{ owner.nom }}
+          </p>
+        </div>
+        <span class="hero-price">{{ apartment.price | number }} DT/mois</span>
       </div>
     </div>
 
-    <div class="summary-card">
-      <div class="summary-icon navy">💳</div>
-      <div class="summary-info">
-        <span class="summary-label">Mes Paiements</span>
-{{ totalPaiements | number }} Dt
-        <span class="summary-sub">Total payé</span>
+    <!-- ══ 3 CARTES RÉSUMÉ ══ -->
+    <div class="summary-grid" *ngIf="apartment">
+
+      <div class="summary-card">
+        <div class="summary-icon green">📋</div>
+        <div class="summary-info">
+          <span class="summary-label">Mon Contrat</span>
+          <span class="summary-value">
+            {{ contract ? (contract.status === 'actif' ? 'Actif' :
+               contract.status === 'expire' ? 'Expiré' :
+               contract.status === 'termine' ? 'Terminé' :
+               contract.status) : 'Aucun' }}
+          </span>
+          <span class="summary-sub" *ngIf="contract">
+            Expire le {{ contract.date_fin }}
+          </span>
+          <span class="summary-sub" *ngIf="!contract">Pas de contrat</span>
+        </div>
       </div>
+
+      <div class="summary-card">
+        <div class="summary-icon gold">🧾</div>
+        <div class="summary-info">
+          <span class="summary-label">Mes Factures</span>
+          <span class="summary-value">{{ factures.length }}</span>
+          <span class="summary-sub" [style.color]="pendingFactures > 0 ? '#ef4444' : '#16a34a'">
+            {{ pendingFactures > 0 ? pendingFactures + ' en attente/retard' : 'Tout est payé ✅' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-icon navy">💳</div>
+        <div class="summary-info">
+          <span class="summary-label">Total Payé</span>
+          <span class="summary-value">{{ totalPaiements | number }} DT</span>
+          <span class="summary-sub">Paiements confirmés</span>
+        </div>
+      </div>
+
     </div>
 
-  </div>
-
-</div>
-
-<!-- LOADING -->
-<div class="loading" *ngIf="loading">
-  <div class="spinner"></div>
-</div>
-
-<!-- ══ MODAL REJOINDRE ══ -->
-<div class="join-modal-overlay" *ngIf="showJoinModal" (click)="showJoinModal = false">
-  <div class="modal join-modal" style="max-width: 420px; background: #ffffff !important; border-radius: 24px; padding: 2.5rem 2rem; box-shadow: 0 25px 80px rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.3); min-height: 320px; display: flex; flex-direction: column; gap: 1rem;" (click)="$event.stopPropagation()">
-
-    <div class="join-modal-icon">🔑</div>
-    <h3>Rejoindre un appartement</h3>
-    <p class="join-sub">Entrez le code fourni par votre propriétaire</p>
-
-    <input type="text"
-           [(ngModel)]="joinCode"
-           placeholder="APT-XXXX"
-           class="join-input"
-           (keyup.enter)="joinApartment()" />
-
-    <!-- Message succès ou erreur -->
-    <div class="join-msg success" *ngIf="joinMsg && joinMsg.startsWith('✅')">
-      {{ joinMsg }}
-    </div>
-    <div class="join-msg error" *ngIf="joinMsg && joinMsg.startsWith('❌')">
-      {{ joinMsg }}
-    </div>
-
-    <div class="modal-actions">
-      <button class="btn-cancel" (click)="showJoinModal = false; joinCode = ''; joinMsg = ''">
-        Annuler
-      </button>
-      <button class="btn-save"
-              (click)="joinApartment()"
-              [disabled]="joinLoading || !joinCode.trim()">
-        {{ joinLoading ? 'Vérification...' : 'Rejoindre' }}
-      </button>
+    <!-- ══ PROPRIÉTAIRE INFO ══ -->
+    <div class="owner-card" *ngIf="apartment && owner">
+      <div class="owner-avatar">{{ (owner.prenom?.charAt(0) || '') + (owner.nom?.charAt(0) || '') }}</div>
+      <div class="owner-info">
+        <span class="owner-name">{{ owner.prenom }} {{ owner.nom }}</span>
+        <span class="owner-label">Votre propriétaire</span>
+      </div>
+      <div class="owner-actions">
+        <a [href]="'mailto:' + owner.email" class="btn-contact">✉️ Email</a>
+        <a [href]="'tel:' + owner.telephone" class="btn-contact" *ngIf="owner.telephone">📞 Appeler</a>
+      </div>
     </div>
 
   </div>

@@ -9,6 +9,4 @@ import { Router, RouterModule } from '@angular/router';
 })
 export class App {
 
-
-
 }

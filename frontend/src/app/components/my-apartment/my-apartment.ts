@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api';
@@ -11,19 +11,15 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './my-apartment.html',
   styleUrl: './my-apartment.css'
 })
-export class MyApartmentComponent implements OnInit, AfterViewInit {
+export class MyApartmentComponent implements OnInit {
 
   user      = JSON.parse(localStorage.getItem('user') || '{}');
-  apartment: any  = null;
-  contract:  any  = null;
+  apartment: any   = null;
+  contract:  any   = null;
   factures:  any[] = [];
+  owner:     any   = null;
   loading         = true;
-
-  // Modal rejoindre
-  showJoinModal = false;
-  joinCode      = '';
-  joinMsg       = '';
-  joinLoading   = false;
+  contractExpired = false;
 
   constructor(private api: ApiService, private auth: AuthService) {}
 
@@ -31,71 +27,59 @@ export class MyApartmentComponent implements OnInit, AfterViewInit {
     this.loadData();
   }
 
-  ngAfterViewInit() {}
-
   loadData() {
     this.loading = true;
 
+    // Load apartment
     this.api.getApartments(this.user.id).subscribe({
       next: (res) => {
         this.apartment = res[0] || null;
-        this.loading = false;
+        this.loading   = false;
+
+        // If has apartment → load owner info
+        if (this.apartment) {
+          this.loadOwner();
+        }
       },
-      error: (err) => {
-        this.apartment = null;
-        this.loading = false;
-      }
+      error: () => { this.apartment = null; this.loading = false; }
     });
 
-    this.api.getContracts().subscribe({
-      next: (res) => {
-        this.contract = res.find((c: any) => c.tenant_id === this.user.id) || null;
+    // Load contracts — most recent first
+    this.api.getContractsForUser(this.user.id).subscribe({
+      next: (res: any[]) => {
+        const sorted = res.sort((a, b) =>
+          new Date(b.date_debut).getTime() - new Date(a.date_debut).getTime()
+        );
+        this.contract = sorted[0] || null;
+
+        // Check if contract is expired
+        if (this.contract) {
+          const today = new Date().toISOString().split('T')[0];
+          this.contractExpired = this.contract.date_fin < today
+            || this.contract.status === 'expire'
+            || this.contract.status === 'termine';
+        }
       },
-      error: (err) => {}
+      error: () => this.contract = null
     });
 
-    this.api.getFactures().subscribe({
-      next: (res) => {
-        this.factures = res.filter((f: any) => this.contract && f.contract_id === this.contract.id);
-      },
-      error: (err) => {}
-    });
-  }
-
-  joinApartment() {
-    if (!this.joinCode.trim()) return;
-
-    this.joinLoading = true;
-    this.joinMsg     = '';
-
-    this.api.joinApartment({
-      code:    this.joinCode.trim().toUpperCase(),
-      user_id: this.user.id
-    }).subscribe({
-      next: (res: any) => {
-        this.joinMsg     = '✅ ' + (res.message || 'Appartement rejoint avec succès !');
-        this.joinLoading = false;
-        this.joinCode    = '';
-
-        setTimeout(() => {
-          this.showJoinModal = false;
-          this.joinMsg       = '';
-          this.loadData();
-        }, 1500);
-      },
-      error: (err: any) => {
-        this.joinMsg     = '❌ ' + (err.error?.detail || 'Code invalide. Vérifiez le code.');
-        this.joinLoading = false;
-      }
+    // Load factures
+    this.api.getFacturesForUser(this.user.id).subscribe({
+      next: (res: any[]) => this.factures = res,
+      error: () => this.factures = []
     });
   }
 
-  onJoinClick() {
-    this.showJoinModal = true;
+  loadOwner() {
+    // Get chat contacts — for locataire this returns the propriétaire
+    this.api.getChatContacts(this.user.id).subscribe({
+      next: (res: any[]) => this.owner = res[0] || null,
+      error: () => this.owner = null
+    });
   }
 
   get pendingFactures() {
-    return this.factures.filter(f => f.status === 'en_attente').length;
+    return this.factures.filter(f => f.status === 'en_attente' || f.status === 'en_retard').length;
   }
 
   get totalPaiements() {

@@ -1,128 +1,153 @@
 ﻿<div class="app-shell">
   <aside class="sidebar">
+
     <div class="sidebar-logo">
-      <span class="logo-icon">&#127970;</span>
+      <span class="logo-icon">🏢</span>
       <span class="logo-text">JORILINA IMMO</span>
     </div>
 
     <nav class="sidebar-nav">
-      <div class="nav-item disabled" aria-disabled="true" title="Bientot disponible">
-        <span class="nav-icon">&#128202;</span>
-        <span>Dashboard</span>
-        <span class="soon-tag">Bientot</span>
-      </div>
 
+      <!-- PROPRIÉTAIRE -->
       <ng-container *ngIf="isOwner">
-        <a routerLink="/departments" routerLinkActive="active" class="nav-item">
-          <span class="nav-icon">&#127970;</span>
-          <span>Departements</span>
+
+        <a routerLink="/departments"  routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">🏢</span>
+          <span>Départements</span>
         </a>
 
-        <a routerLink="/apartments" routerLinkActive="active" class="nav-item">
-          <span class="nav-icon">&#127968;</span>
+        <a routerLink="/apartments"   routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">🏠</span>
           <span>Appartements</span>
         </a>
 
-        <a routerLink="/users" routerLinkActive="active" class="nav-item">
-          <span class="nav-icon">&#128100;</span>
+        <a routerLink="/users"        routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">👤</span>
           <span>Locataires</span>
         </a>
 
-        <a routerLink="/contracts" routerLinkActive="active" class="nav-item">
-          <span class="nav-icon">&#128196;</span>
+        <a routerLink="/contracts"    routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">📄</span>
           <span>Contrats</span>
         </a>
 
-        <a routerLink="/factures" routerLinkActive="active" class="nav-item">
-          <span class="nav-icon">&#128203;</span>
+        <a routerLink="/factures"     routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">🧾</span>
           <span>Factures</span>
         </a>
 
-        <a routerLink="/payments" routerLinkActive="active" class="nav-item">
-          <span class="nav-icon">&#128179;</span>
-          <span>Paiements</span>
-        </a>
-
-        <a routerLink="/invitations" routerLinkActive="active" class="nav-item">
-          <span class="nav-icon">&#9993;</span>
+        <a routerLink="/invitations"  routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">✉️</span>
           <span>Invitations</span>
         </a>
+
+        <a routerLink="/notifications" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">🔔</span>
+          <span>Notifications</span>
+          <!-- Badge rouge si notifications non lues -->
+          <span class="nav-badge" *ngIf="unreadNotifCount > 0">{{ unreadNotifCount }}</span>
+        </a>
+
+        <!-- ✅ CHAT — nouveau lien -->
+        <a routerLink="/chat" routerLinkActive="active"
+   class="nav-item" (click)="unreadChatCount = 0">
+  <span class="nav-icon">💬</span>
+  <span>Messages</span>
+  <span class="nav-badge" *ngIf="unreadChatCount > 0">
+    {{ unreadChatCount }}
+  </span>
+</a>
+
       </ng-container>
 
-      <!-- LOCATAIRE LINKS -->
-<ng-container *ngIf="isLocataire">
+      <!-- LOCATAIRE -->
+      <ng-container *ngIf="isLocataire">
 
-  <a routerLink="/my-apartment"
-     routerLinkActive="active"
-     class="nav-item">
-    <span class="nav-icon">🏠</span>
-    <span>Mon Appartement</span>
-  </a>
+        <a routerLink="/my-apartment"     routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">🏠</span>
+          <span>Mon Appartement</span>
+        </a>
 
-  <a routerLink="/my-contract"
-     routerLinkActive="active"
-     class="nav-item">
-    <span class="nav-icon">📄</span>
-    <span>Mon Contrat</span>
-  </a>
+        <a routerLink="/my-contract"      routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">📄</span>
+          <span>Mon Contrat</span>
+        </a>
 
-  <a routerLink="/my-factures"
-     routerLinkActive="active"
-     class="nav-item">
-    <span class="nav-icon">🧾</span>
-    <span>Mes Factures</span>
-  </a>
+        <a routerLink="/my-factures"      routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">🧾</span>
+          <span>Mes Factures</span>
+        </a>
 
-  <a routerLink="/my-payments"
-     routerLinkActive="active"
-     class="nav-item">
-    <span class="nav-icon">💳</span>
-    <span>Mes Paiements</span>
-  </a>
+        <a routerLink="/my-payments"      routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">💳</span>
+          <span>Mes Paiements</span>
+        </a>
 
-  <a routerLink="/my-notifications"
-     routerLinkActive="active"
-     class="nav-item">
-    <span class="nav-icon">🔔</span>
-    <span>Notifications</span>
-  </a>
+        <a routerLink="/my-notifications" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">🔔</span>
+          <span>Notifications</span>
+          <span class="nav-badge" *ngIf="unreadNotifCount > 0">{{ unreadNotifCount }}</span>
+        </a>
 
-</ng-container>
+        <!-- ✅ CHAT -->
+        <a routerLink="/chat" routerLinkActive="active" class="nav-item">
+          <span class="nav-icon">💬</span>
+          <span>Messages</span>
+        </a>
+
+      </ng-container>
+
     </nav>
 
-    <button class="logout-btn" (click)="logout()">&#128682; Deconnexion</button>
+    <button class="logout-btn" (click)="logout()">🚪 Déconnexion</button>
+
   </aside>
 
+  <!-- MAIN -->
   <div class="main-wrapper">
+
     <header class="topbar">
+
       <div class="search-box">
-        <span class="search-icon">&#128269;</span>
+        <span class="search-icon">🔍</span>
         <input type="text" placeholder="Rechercher..." />
       </div>
+
       <div class="topbar-right">
+
+        <!-- Cloche avec badge dynamique (WebSocket) -->
         <button class="notif-btn" (click)="goToNotifications()">
-  🔔
-  <span class="notif-badge">2</span>
-</button>
+          🔔
+          <span class="notif-badge" *ngIf="unreadNotifCount > 0">
+            {{ unreadNotifCount }}
+          </span>
+        </button>
+
+        <!-- Avatar avec menu -->
         <div class="avatar" (click)="toggleAccountMenu()">
           {{ user?.nom?.charAt(0) || 'U' }}
         </div>
+
         <div class="account-menu" *ngIf="showAccountMenu">
           <p class="menu-name">{{ user?.prenom }} {{ user?.nom }}</p>
           <p class="menu-email">{{ user?.email }}</p>
-          <button class="menu-btn" (click)="openProfileEditor()">Modifier les donnees</button>
-          <button class="menu-btn danger" (click)="logout()">Deconnexion</button>
+          <button class="menu-btn" (click)="openProfileEditor()">Modifier mon profil</button>
+          <button class="menu-btn danger" (click)="logout()">Déconnexion</button>
         </div>
+
       </div>
     </header>
 
     <main class="main-content">
       <router-outlet></router-outlet>
     </main>
+
   </div>
 
+  <!-- Modal profil -->
   <div class="modal-overlay" *ngIf="showProfileModal" (click)="closeProfileEditor()">
     <div class="modal profile-modal" (click)="$event.stopPropagation()">
+
       <h3>Mon Compte</h3>
 
       <div class="field">
@@ -130,7 +155,7 @@
         <input [(ngModel)]="profileForm.nom" />
       </div>
       <div class="field">
-        <label>Prenom</label>
+        <label>Prénom</label>
         <input [(ngModel)]="profileForm.prenom" />
       </div>
       <div class="field">
@@ -138,7 +163,7 @@
         <input type="email" [(ngModel)]="profileForm.email" />
       </div>
       <div class="field">
-        <label>Telephone</label>
+        <label>Téléphone</label>
         <input [(ngModel)]="profileForm.telephone" />
       </div>
 
@@ -147,9 +172,11 @@
       <div class="modal-actions">
         <button class="btn-cancel" (click)="closeProfileEditor()">Annuler</button>
         <button class="btn-save" (click)="saveProfile()" [disabled]="savingProfile">
-          {{ savingProfile ? 'Enregistrement...' : 'Modifier les donnees' }}
+          {{ savingProfile ? 'Enregistrement...' : 'Enregistrer' }}
         </button>
       </div>
+
     </div>
   </div>
+
 </div>

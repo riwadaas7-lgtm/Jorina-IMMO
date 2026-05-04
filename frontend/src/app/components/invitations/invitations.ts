@@ -12,59 +12,147 @@ import { ApiService } from '../../services/api';
 })
 export class InvitationsComponent implements OnInit {
 
-  user       = JSON.parse(localStorage.getItem('user') || '{}');
-  apartments: any[] = [];
+  user = JSON.parse(localStorage.getItem('user') || '{}');
 
-  // Code généré
-  currentCode       = this.randomCode();
-  selectedApartment = ''; // appartement choisi pour ce code
-  copied  = false;
-  saved   = false;
+  // Liste des appartements avec leurs codes
+  apartments: any[] = [];
+  loading = false;
+
+  // Appartement sélectionné pour générer/modifier un code
+  selectedApt: any = null;
+
+  // Modal de confirmation de modification de code
+  showConfirmModal = false;
+  confirmApt: any  = null;
+
+  // Messages de feedback
+  successMsg = '';
+  errorMsg   = '';
 
   constructor(private api: ApiService) {}
 
   ngOnInit() {
-    // Charge les appartements du propriétaire
-    this.api.getApartments(this.user.id).subscribe(res => this.apartments = res);
+    this.loadApartments();
   }
 
-  // ✅ Génère un code aléatoire style APT-A3XZ
-  randomCode(): string {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let code = 'APT-';
-    for (let i = 0; i < 4; i++) {
-      code += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return code;
-  }
-
-  // ✅ Génère un nouveau code
-  generateCode() {
-    this.currentCode = this.randomCode();
-    this.saved  = false;
-    this.copied = false;
-  }
-
-  // ✅ Copie le code dans le presse-papier
-  copyCode() {
-    navigator.clipboard.writeText(this.currentCode);
-    this.copied = true;
-    setTimeout(() => this.copied = false, 2000);
-  }
-
-  // ✅ Associe le code à l'appartement sélectionné et sauvegarde dans le backend
-  saveCode() {
-    if (!this.selectedApartment) return;
-
-    const apt = this.apartments.find(a => a.id == this.selectedApartment);
-
-    // Envoie le nouveau code au backend
-    this.api.updateApartment(+this.selectedApartment, {
-      ...apt,
-      code: this.currentCode
-    }).subscribe(() => {
-      this.saved = true;
-      setTimeout(() => this.saved = false, 3000);
+  /**
+   * Charge tous les appartements avec leurs codes actuels
+   * et les infos du locataire associé
+   */
+  loadApartments() {
+    this.loading = true;
+    this.api.getInvitationCodes(this.user.id).subscribe({
+      next: (res: any[]) => {
+        this.apartments = res;
+        this.loading    = false;
+      },
+      error: () => {
+        this.loading  = false;
+        this.errorMsg = 'Impossible de charger les appartements.';
+      }
     });
+  }
+
+  /**
+   * Génère un nouveau code pour un appartement.
+   *
+   * Si l'appartement est OCCUPÉ → affiche une confirmation d'abord
+   * (car le locataire sera expulsé automatiquement)
+   *
+   * Si l'appartement est LIBRE → génère directement sans confirmation
+   */
+  onGenerateCode(apt: any) {
+    if (apt.status === 'occupe') {
+      // Demande confirmation car le locataire sera expulsé
+      this.confirmApt       = apt;
+      this.showConfirmModal = true;
+    } else {
+      // Appartement libre → génère directement
+      this.generateCode(apt);
+    }
+  }
+
+  /**
+   * Confirmation : le propriétaire accepte d'expulser le locataire
+   * et de générer un nouveau code
+   */
+  confirmGenerate() {
+    this.showConfirmModal = false;
+    if (this.confirmApt) {
+      this.generateCode(this.confirmApt);
+      this.confirmApt = null;
+    }
+  }
+
+  /**
+   * Appelle l'API pour générer le code.
+   * Le backend :
+   * 1. Expulse le locataire si présent (apartment_id = null)
+   * 2. Marque l'appartement comme libre
+   * 3. Génère le nouveau code (APT-XXXX)
+   * 4. Envoie notification WebSocket au locataire expulsé
+   */
+  generateCode(apt: any) {
+    this.api.generateInvitationCode(apt.id).subscribe({
+      next: (res: any) => {
+        this.successMsg = `✅ Code généré pour ${apt.nom} : ${res.code}`;
+        setTimeout(() => this.successMsg = '', 4000);
+        this.loadApartments(); // recharge pour voir la carte mise à jour
+      },
+      error: (err: any) => {
+        this.errorMsg = err.error?.detail || 'Erreur lors de la génération du code.';
+        setTimeout(() => this.errorMsg = '', 4000);
+      }
+    });
+  }
+
+  /**
+   * Supprime le code d'un appartement.
+   * L'appartement devient libre sans code.
+   * Le locataire (s'il y en a un) est expulsé.
+   */
+  deleteCode(apt: any) {
+    const msg = apt.tenant
+      ? `Supprimer le code de ${apt.nom} ? Le locataire ${apt.tenant.prenom} ${apt.tenant.nom} sera expulsé.`
+      : `Supprimer le code de ${apt.nom} ?`;
+
+    if (!confirm(msg)) return;
+
+    this.api.deleteInvitationCode(apt.id).subscribe({
+      next: () => {
+        this.successMsg = `✅ Code supprimé. L'appartement ${apt.nom} est maintenant libre.`;
+        setTimeout(() => this.successMsg = '', 4000);
+        this.loadApartments();
+      },
+      error: (err: any) => {
+        this.errorMsg = err.error?.detail || 'Erreur lors de la suppression du code.';
+        setTimeout(() => this.errorMsg = '', 4000);
+      }
+    });
+  }
+
+  /**
+   * Copie le code dans le presse-papier
+   */
+  copyCode(code: string) {
+    navigator.clipboard.writeText(code).then(() => {
+      this.successMsg = '📋 Code copié !';
+      setTimeout(() => this.successMsg = '', 2000);
+    });
+  }
+
+  // Initiales pour l'avatar du locataire
+  initials(tenant: any): string {
+    return ((tenant.prenom?.charAt(0) || '') + (tenant.nom?.charAt(0) || '')).toUpperCase();
+  }
+
+  // Appartements avec un code généré (colonne droite)
+  get aptsWithCode() {
+    return this.apartments.filter(a => a.code);
+  }
+
+  // Appartements sans code (colonne gauche)
+  get aptsWithoutCode() {
+    return this.apartments.filter(a => !a.code);
   }
 }

@@ -19,14 +19,20 @@ export class MyContractComponent implements OnInit {
   constructor(private api: ApiService) {}
 
   ngOnInit() {
-    this.api.getContracts().subscribe((res: any[]) => {
-      this.contract = res.find(c => c.tenant_id === this.user.id) || null;
-      this.loading  = false;
+    this.api.getContractsForUser(this.user.id).subscribe({
+      next: (res: any[]) => {
+        this.contract = res[0] || null;
+        this.loading  = false;
 
-      if (this.contract) {
-        this.api.getApartments(this.user.id).subscribe((apts: any[]) => {
-          this.apartment = apts.find(a => a.id === this.contract.apartment_id) || apts[0];
-        });
+        if (this.contract) {
+          this.api.getApartments(this.user.id).subscribe((apts: any[]) => {
+            this.apartment = apts[0] || null;
+          });
+        }
+      },
+      error: () => {
+        this.loading  = false;
+        this.contract = null;
       }
     });
   }

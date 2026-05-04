@@ -69,13 +69,19 @@
           <span class="info-value">{{ c.caution | number }} DT</span>
         </div>
       </div>
-
+      
       <div class="contract-actions">
-        <button class="btn-voir" (click)="viewContract(c)">Voir</button>
-
-        <button class="btn-dl" *ngIf="!c.contract_file" disabled>Aucun fichier</button>
-        <button class="btn-delete" (click)="delete(c.id)">Supprimer</button>
-      </div>
+  <button class="btn-icon voir" (click)="viewContract(c)">Voir</button>
+  <button class="btn-icon modifier" (click)="openEdit(c)"
+          [disabled]="c.status === 'termine'">✏️</button>
+  <button class="btn-renew" (click)="openRenew(c)"
+          [disabled]="c.status === 'termine'">🔄</button>
+  <button class="btn-terminate" (click)="askTerminate(c)"
+          *ngIf="c.status !== 'termine'">🛑</button>
+  <button class="danger" (click)="delete(c.id)"
+          *ngIf="c.status === 'termine' || c.status === 'expire'">🗑️ Supprimer</button>
+</div>
+      
     </div>
   </div>
 
@@ -164,4 +170,118 @@
       </div>
     </div>
   </div>
+  <!-- MODAL MODIFICATION CONTRAT -->
+<div class="modal-overlay" *ngIf="showEditModal" (click)="showEditModal = false">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h3>Modifier le Contrat</h3>
+
+    <div class="field">
+      <label>Locataire</label>
+      <select [(ngModel)]="editForm.tenant_id">
+        <option value="">-- Choisir un locataire --</option>
+        <option *ngFor="let u of tenants" [value]="u.id">{{ u.prenom }} {{ u.nom }}</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Appartement</label>
+      <select [(ngModel)]="editForm.apartment_id">
+        <option value="">-- Choisir un appartement --</option>
+        <option *ngFor="let a of apartments" [value]="a.id">{{ a.nom }}</option>
+      </select>
+    </div>
+
+    <div class="fields-row">
+      <div class="field">
+        <label>Date début</label>
+        <input type="date" [(ngModel)]="editForm.date_debut" />
+      </div>
+      <div class="field">
+        <label>Date fin</label>
+        <input type="date" [(ngModel)]="editForm.date_fin" />
+      </div>
+    </div>
+
+    <div class="fields-row">
+      <div class="field">
+        <label>Loyer mensuel</label>
+        <input type="number" [(ngModel)]="editForm.montant_total" />
+      </div>
+      <div class="field">
+        <label>Caution</label>
+        <input type="number" [(ngModel)]="editForm.caution" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Fichier contrat</label>
+      <input type="file" accept="image/*" (change)="onSelectContractFile($event)" />
+      <small *ngIf="editForm.contract_file">Fichier chargé</small>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="showEditModal = false">Annuler</button>
+      <button class="btn-save" (click)="saveEdit()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+<!-- MODAL RENOUVELLEMENT -->
+<div class="modal-overlay" *ngIf="showRenewModal" (click)="showRenewModal = false">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h3>🔄 Renouveler le contrat</h3>
+
+    <div class="view-field" *ngIf="renewingContract">
+      <span class="view-label">Locataire</span>
+      <span class="view-val">{{ renewingContract.tenant_name }}</span>
+    </div>
+    <div class="view-field" *ngIf="renewingContract">
+      <span class="view-label">Appartement</span>
+      <span class="view-val">{{ renewingContract.apartment_name }}</span>
+    </div>
+    <div class="view-field" *ngIf="renewingContract">
+      <span class="view-label">Ancienne date de fin</span>
+      <span class="view-val">{{ renewingContract.date_fin }}</span>
+    </div>
+
+    <div class="field" style="margin-top:16px">
+      <label>Nouvelle date de fin <span style="color:red">*</span></label>
+      <input type="date" [(ngModel)]="renewForm.date_fin" />
+    </div>
+
+    <p style="font-size:12px; color:#888; margin-top:8px">
+      ℹ️ La date de début sera mise à jour à aujourd'hui.
+      Le locataire recevra une notification et un email.
+    </p>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="showRenewModal = false">Annuler</button>
+      <button class="btn-save" (click)="saveRenew()">✅ Confirmer le renouvellement</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMATION RÉSILIATION -->
+<div class="modal-overlay" *ngIf="showTerminateConfirm" (click)="showTerminateConfirm = false">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div style="text-align:center; font-size:48px">🛑</div>
+    <h3 style="text-align:center">Terminer ce contrat ?</h3>
+
+    <div *ngIf="terminatingContract" style="background:#fef2f2; border-radius:10px; padding:14px; margin:12px 0">
+      <p style="font-size:14px; color:#555">
+        Le contrat de <strong>{{ terminatingContract.tenant_name }}</strong>
+        pour l'appartement <strong>{{ terminatingContract.apartment_name }}</strong>
+        sera terminé immédiatement.
+      </p>
+      <p style="font-size:13px; color:#dc2626; margin-top:8px">
+        ⚠️ Le locataire deviendra "Ancien", l'appartement sera libéré,
+        et un email lui sera envoyé.
+      </p>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="showTerminateConfirm = false">Annuler</button>
+      <button class="btn-confirm-danger" (click)="confirmTerminate()">🛑 Confirmer la résiliation</button>
+    </div>
+  </div>
+</div>
 </div>

@@ -16,7 +16,7 @@ export class RoleGuard implements CanActivate {
     const userRole = this.auth.getRole();
 
     if (requiredRole && userRole !== requiredRole) {
-      // Wrong role → redirect to their own dashboard
+      // Wrong role :redirect to their own dashboard
       this.auth.redirectAfterLogin();
       return false;
     }

@@ -1,0 +1,114 @@
+<div class="chat-page">
+
+  <!-- SIDEBAR CONTACTS -->
+  <div class="chat-sidebar">
+    <div class="chat-sidebar-header">
+      <h3>Messages</h3>
+      <span class="unread-total" *ngIf="totalUnread() > 0">{{ totalUnread() }}</span>
+    </div>
+
+    <div class="contacts-list">
+      <div class="contact-item"
+           *ngFor="let c of contacts"
+           [class.active]="activeContact?.id === c.id"
+           (click)="selectContact(c)">
+        <div class="contact-avatar">{{ c.initials }}</div>
+        <div class="contact-info">
+          <span class="contact-name">{{ c.prenom }} {{ c.nom }}</span>
+          <span class="contact-role">{{ c.role === 'locataire' ? 'Locataire' : 'Propriétaire' }}</span>
+        </div>
+        <span class="unread-badge" *ngIf="unreadByContact[c.id] > 0">
+          {{ unreadByContact[c.id] }}
+        </span>
+      </div>
+    </div>
+
+    <div class="no-contacts" *ngIf="contacts.length === 0">
+      <span>💬</span>
+      <p>Aucun contact disponible</p>
+    </div>
+  </div>
+
+  <!-- ZONE CHAT -->
+  <div class="chat-main">
+
+    <!-- Pas de contact sélectionné -->
+    <div class="chat-empty" *ngIf="!activeContact">
+      <div class="chat-empty-icon">💬</div>
+      <h3>Sélectionnez un contact</h3>
+      <p>Choisissez un contact pour commencer une conversation</p>
+    </div>
+
+    <ng-container *ngIf="activeContact">
+
+      <!-- HEADER -->
+      <div class="chat-header">
+        <div class="chat-header-avatar">{{ activeContact.initials }}</div>
+        <div>
+          <h4>{{ activeContact.prenom }} {{ activeContact.nom }}</h4>
+          <span class="online-dot">
+            🟢 En ligne
+          </span>
+        </div>
+      </div>
+
+      <!-- MESSAGES -->
+      <div class="messages-container">
+
+        <div class="loading-msgs" *ngIf="loadingMsgs">
+          <div class="spinner-sm"></div>
+          Chargement de l'historique...
+        </div>
+
+        <ng-container *ngIf="!loadingMsgs">
+
+          <div class="empty-conv" *ngIf="currentMessages.length === 0">
+            <p>Commencez la conversation avec {{ activeContact.prenom }} 👋</p>
+          </div>
+
+          <ng-container *ngFor="let msg of currentMessages; let i = index">
+
+            <!-- SÉPARATEUR DATE — affiché quand le jour change -->
+            <div class="date-separator" *ngIf="showDateSeparator(currentMessages, i)">
+              <span>{{ msg.date }}</span>
+            </div>
+
+            <!-- BULLE MESSAGE -->
+            <div class="message-wrapper"
+                 [class.mine]="msg.is_mine"
+                 [class.theirs]="!msg.is_mine">
+              <div class="message-bubble">
+                <p class="message-text">{{ msg.content }}</p>
+                <span class="message-time">{{ msg.time }}</span>
+              </div>
+            </div>
+
+          </ng-container>
+
+        </ng-container>
+
+        <!-- Anchor pour auto-scroll -->
+        <div #messagesEnd></div>
+
+      </div>
+
+      <!-- SAISIE -->
+      <div class="chat-input-area">
+        <textarea
+          [(ngModel)]="newMessage"
+          (keydown)="onKeydown($event)"
+          placeholder="Écrivez un message... (Entrée pour envoyer)"
+          class="chat-input"
+          rows="1">
+        </textarea>
+        <button class="btn-send"
+                (click)="sendMessage()"
+                [disabled]="!newMessage.trim()">
+          ➤
+        </button>
+      </div>
+
+    </ng-container>
+  </div>
+
+</div>

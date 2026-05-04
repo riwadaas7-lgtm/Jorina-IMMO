@@ -331,3 +331,121 @@
   color: white; font-weight: 700; font-size: 14px;
 }
 .btn-save:hover { background: var(--gold-hover); }
+
+
+/* CIN Search Row */
+.cin-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.cin-row input { flex: 1; }
+
+.btn-search {
+  background: var(--navy);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+.btn-search:hover:not(:disabled) { opacity: 0.85; }
+.btn-search:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Banners */
+.found-banner {
+  background: #f0fdf4;
+  border: 1px solid #22c55e;
+  color: #16a34a;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+}
+
+.notfound-banner {
+  background: #eff6ff;
+  border: 1px solid #93c5fd;
+  color: #1d4ed8;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+}
+
+/* Read-only fields */
+input[readonly] {
+  background: #f8fafc !important;
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+/* Checkbox */
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--navy);
+}
+
+.checkbox-row input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* Error */
+.error-msg {
+  background: #fef2f2;
+  color: var(--danger);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid #fecaca;
+}
+
+/* Required star */
+.required { color: var(--danger); }
+
+.btn-icon {
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  width: 38px;
+  height: 38px;
+  font-size: 16px;
+  display:inline-flexbox;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.btn-icon.edit:hover { border-color: var(--navy); background: #f0f4ff; }
+.btn-icon.del:hover  { border-color: var(--danger); background: #fff0f0; }
+.ancien-banner {
+  background: #f3f4f6;
+  color: #6b7280;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-top: 6px;
+}
+
+.badge-count {
+  background: #ef4444;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 20px;
+  margin-left: 4px;
+}
+
+.user-card.ancien {
+  opacity: 0.75;
+  border-left: 4px solid #9ca3af;
+}

@@ -1,58 +1,174 @@
 <div class="page">
 
-  <h2 class="page-title">Invitations</h2>
+  <div class="page-header">
+    <h2 class="page-title">Invitations & Codes d'accès</h2>
+  </div>
 
-  <div class="inv-grid">
+  <!-- MESSAGES FEEDBACK -->
+  <div class="success-msg" *ngIf="successMsg">{{ successMsg }}</div>
+  <div class="error-msg"   *ngIf="errorMsg">{{ errorMsg }}</div>
 
-    <!-- CARTE : Générer un code -->
-    <div class="inv-card">
-      <h3>Inviter un locataire</h3>
-      <p class="inv-sub">
-        Générez un code unique et partagez-le avec votre locataire.
-        Il devra l'entrer dans son espace pour rejoindre l'appartement.
-      </p>
+  <!-- LOADING -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Chargement des appartements...</p>
+  </div>
 
-      <div class="code-label">Code d'invitation actuel</div>
+  <div class="inv-layout" *ngIf="!loading">
 
-      <div class="code-box">
-        <span class="code-text">{{ currentCode }}</span>
-        <button class="btn-copy" (click)="copyCode()">
-          📋 Copier le code
-        </button>
+    <!-- ══ COLONNE GAUCHE — Appartements sans code ══════════════════════ -->
+    <div class="inv-left">
+
+      <div class="section-header">
+        <h3>Appartements</h3>
+        <span class="section-sub">Sélectionnez un appartement pour générer un code</span>
       </div>
 
-      <div class="copy-success" *ngIf="copied">✅ Code copié !</div>
+      <div class="apt-list">
 
-      <!-- Bouton pour générer un nouveau code -->
-      <button class="btn-generate" (click)="generateCode()">
-        🔄 Générer un nouveau code
-      </button>
+        <div class="apt-item"
+             *ngFor="let a of apartments"
+             [class.occupied]="a.status === 'occupe'"
+             [class.has-code]="!!a.code">
 
-      <!-- Choisir à quel appartement associer ce code -->
-      <div class="field">
-        <label>Associer à un appartement</label>
-        <select [(ngModel)]="selectedApartment">
-          <option value="">-- Choisir un appartement --</option>
-          <option *ngFor="let a of apartments" [value]="a.id">
-            {{ a.nom }}
-          </option>
-        </select>
+          <div class="apt-item-left">
+            <div class="apt-icon">🏠</div>
+            <div class="apt-details">
+              <span class="apt-name">{{ a.nom }}</span>
+              <span class="apt-price">{{ a.price | number }} DT/mois</span>
+            </div>
+          </div>
+
+          <div class="apt-item-right">
+            <span class="status-dot" [ngClass]="a.status">
+              {{ a.status === 'occupe' ? 'Occupé' : 'Libre' }}
+            </span>
+
+            <!-- Bouton générer/modifier code -->
+            <button class="btn-gen"
+                    (click)="onGenerateCode(a)"
+                    [title]="a.code ? 'Modifier le code' : 'Générer un code'">
+              {{ a.code ? '🔄 Modifier' : '🔑 Générer' }}
+            </button>
+          </div>
+
+        </div>
+
+        <div class="empty-list" *ngIf="apartments.length === 0">
+          <p>Aucun appartement trouvé.</p>
+          <p class="empty-sub">Créez d'abord des appartements dans l'onglet Appartements.</p>
+        </div>
+
       </div>
 
-      <!-- Sauvegarder le code dans le backend -->
-      <button class="btn-save-code"
-              [disabled]="!selectedApartment"
-              (click)="saveCode()">
-        💾 Enregistrer le code
-      </button>
+    </div>
 
-      <div class="save-success" *ngIf="saved">
-        ✅ Code enregistré ! Le locataire peut maintenant rejoindre.
+    <!-- ══ COLONNE DROITE — Codes générés ══════════════════════════════ -->
+    <div class="inv-right">
+
+      <div class="section-header">
+        <h3>Codes générés</h3>
+        <span class="section-sub">{{ aptsWithCode.length }} code(s) actif(s)</span>
+      </div>
+
+      <!-- CARTES DES CODES -->
+      <div class="codes-list">
+
+        <div class="code-card" *ngFor="let a of aptsWithCode"
+             [class.occupied]="a.status === 'occupe'">
+
+          <!-- HEADER CARTE -->
+          <div class="code-card-header">
+            <div>
+              <h4 class="code-apt-name">{{ a.nom }}</h4>
+              <span class="code-price">{{ a.price | number }} DT/mois</span>
+            </div>
+            <span class="code-status" [ngClass]="a.status">
+              {{ a.status === 'occupe' ? '🔴 Occupé' : '🟢 Libre' }}
+            </span>
+          </div>
+
+          <!-- LE CODE -->
+          <div class="code-display">
+            <span class="code-text">{{ a.code }}</span>
+            <button class="btn-copy" (click)="copyCode(a.code)" title="Copier">
+              📋
+            </button>
+          </div>
+
+          <!-- DATE DE GÉNÉRATION -->
+          <div class="code-date" *ngIf="a.code_date">
+            📅 Généré le {{ a.code_date }}
+          </div>
+
+          <!-- LOCATAIRE ACTUEL -->
+          <div class="code-tenant" *ngIf="a.tenant">
+            <div class="tenant-avatar">{{ initials(a.tenant) }}</div>
+            <div class="tenant-info">
+              <span class="tenant-name">{{ a.tenant.prenom }} {{ a.tenant.nom }}</span>
+              <span class="tenant-email">{{ a.tenant.email }}</span>
+            </div>
+          </div>
+
+          <div class="code-no-tenant" *ngIf="!a.tenant">
+            👤 Aucun locataire assigné
+          </div>
+
+          <!-- ACTIONS -->
+          <div class="code-actions">
+            <button class="btn-modify" (click)="onGenerateCode(a)">
+              🔄 Modifier le code
+            </button>
+            <button class="btn-delete-code" (click)="deleteCode(a)">
+              🗑️ Supprimer
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Aucun code généré -->
+      <div class="empty-codes" *ngIf="aptsWithCode.length === 0">
+        <div class="empty-icon">🔑</div>
+        <p>Aucun code généré</p>
+        <p class="empty-sub">Cliquez sur "Générer" à gauche pour créer un code d'accès</p>
       </div>
 
     </div>
 
   </div>
 
-</div>
+  <!-- ══ MODAL CONFIRMATION EXPULSION ════════════════════════════════════ -->
+  <div class="modal-overlay" *ngIf="showConfirmModal" (click)="showConfirmModal = false">
+    <div class="modal confirm-modal" (click)="$event.stopPropagation()">
 
+      <div class="confirm-icon">⚠️</div>
+      <h3>Attention — Locataire actuel</h3>
+
+      <div class="confirm-info" *ngIf="confirmApt">
+        <p>L'appartement <strong>{{ confirmApt.nom }}</strong> est actuellement occupé par :</p>
+        <div class="confirm-tenant" *ngIf="confirmApt.tenant">
+          <strong>{{ confirmApt.tenant.prenom }} {{ confirmApt.tenant.nom }}</strong>
+          <span>{{ confirmApt.tenant.email }}</span>
+        </div>
+        <p class="confirm-warning">
+          En générant un nouveau code, ce locataire sera <strong>automatiquement expulsé</strong>
+          et recevra une notification. Il ne pourra plus accéder à son espace
+          jusqu'à ce que vous lui envoyiez le nouveau code.
+        </p>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="showConfirmModal = false">
+          Annuler
+        </button>
+        <button class="btn-confirm-danger" (click)="confirmGenerate()">
+          ⚠️ Confirmer et expulser
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

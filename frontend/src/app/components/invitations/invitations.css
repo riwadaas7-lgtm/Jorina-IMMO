@@ -1,182 +1,364 @@
+.page { position: relative; }
+
+.page-header {
+  margin-bottom: 20px;
+}
+
 .page-title {
   font-size: 26px;
   font-weight: 800;
   color: var(--navy);
-  margin-bottom: 24px;
 }
 
-.inv-grid {
+/* FEEDBACK */
+.success-msg {
+  background: #f0fdf4;
+  border: 1px solid #22c55e;
+  color: #16a34a;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.error-msg {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+/* LOADING */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px;
+  gap: 12px;
+  color: var(--muted);
+}
+.spinner {
+  width: 36px; height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* LAYOUT 2 COLONNES */
+.inv-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
-  margin-bottom: 24px;
+  align-items: start;
 }
 
-.inv-card {
-  background: var(--white);
-  border-radius: var(--radius);
-  padding: 28px;
-  box-shadow: var(--shadow);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.section-header {
+  margin-bottom: 16px;
 }
-
-.inv-card h3 {
-  font-size: 20px;
+.section-header h3 {
+  font-size: 18px;
   font-weight: 700;
   color: var(--navy);
+  margin-bottom: 4px;
 }
-
-.inv-sub {
-  font-size: 14px;
+.section-sub {
+  font-size: 12px;
   color: var(--muted);
-  line-height: 1.5;
 }
 
-.code-label {
-  font-size: 13px;
-  color: var(--muted);
-  font-weight: 500;
-}
-
-/* CODE BOX */
-.code-box {
-  border: 2px dashed var(--gold);
-  border-radius: 14px;
-  background: #fffbf0;
-  padding: 20px;
+/* ══ COLONNE GAUCHE — Liste appartements ══ */
+.apt-list {
   display: flex;
   flex-direction: column;
+  gap: 10px;
+}
+
+.apt-item {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  box-shadow: var(--shadow);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-left: 4px solid var(--border);
+  transition: transform 0.15s;
+}
+.apt-item:hover { transform: translateX(4px); }
+.apt-item.occupied  { border-left-color: #ef4444; }
+.apt-item.has-code  { border-left-color: var(--gold); }
+
+.apt-item-left {
+  display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.code-text {
-  font-size: 32px;
-  font-weight: 800;
-  color: var(--navy);
-  letter-spacing: 4px;
-}
-
-.btn-copy {
-  background: none;
-  border: none;
-  color: var(--gold);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: opacity 0.2s;
-}
-.btn-copy:hover { opacity: 0.75; }
-
-.copy-success {
-  color: #16a34a;
-  font-size: 13px;
-  font-weight: 600;
-  text-align: center;
-}
-
-/* GENERATE BUTTON */
-.btn-generate {
-  background: var(--gold);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  padding: 14px;
-  font-size: 15px;
-  font-weight: 700;
-  width: 100%;
-  transition: background 0.2s;
+.apt-icon {
+  font-size: 22px;
+  width: 40px; height: 40px;
+  background: var(--bg);
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-}
-.btn-generate:hover { background: var(--gold-hover); }
-
-.mt { margin-top: 4px; }
-
-.field { display: flex; flex-direction: column; gap: 6px; }
-.field label { font-weight: 600; font-size: 13px; color: var(--navy); }
-.field input, .field select {
-  padding: 12px 14px;
-  border: 1.5px solid var(--border);
-  border-radius: 10px;
-  font-size: 14px; outline: none; background: #fafafa;
-}
-.field input:focus, .field select:focus { border-color: var(--navy); }
-
-.code-input {
-  font-size: 18px !important;
-  font-weight: 600 !important;
-  letter-spacing: 3px;
-  text-align: center;
 }
 
-.btn-save-code {
+.apt-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--navy);
+  display: block;
+}
+.apt-price {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.apt-item-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-dot {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+.status-dot.occupe { background: #fee2e2; color: #dc2626; }
+.status-dot.libre  { background: #dcfce7; color: #16a34a; }
+
+.btn-gen {
   background: var(--navy);
   color: white;
   border: none;
-  border-radius: 12px;
-  padding: 12px;
-  font-size: 14px;
-  font-weight: 700;
-  width: 100%;
-  transition: opacity 0.2s;
-}
-.btn-save-code:hover:not(:disabled) { opacity: 0.85; }
-.btn-save-code:disabled { opacity: 0.4; cursor: not-allowed; }
-
-.save-success, .join-success {
-  font-size: 13px;
-  font-weight: 600;
-  text-align: center;
-  padding: 8px;
   border-radius: 8px;
-  background: #f0fdf4;
-  color: #16a34a;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+.btn-gen:hover { opacity: 0.85; }
+
+.empty-list {
+  text-align: center;
+  padding: 40px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.empty-sub { font-size: 12px; margin-top: 6px; }
+
+/* ══ COLONNE DROITE — Cartes codes ══ */
+.codes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.btn-join {
-  background: none;
-  border: 2px solid var(--navy);
-  border-radius: 12px;
-  padding: 14px;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--navy);
-  width: 100%;
-  transition: all 0.2s;
-}
-.btn-join:hover { background: var(--navy); color: white; }
-
-/* HISTORY */
-.history-card {
+.code-card {
   background: var(--white);
   border-radius: var(--radius);
-  padding: 24px;
+  padding: 20px;
   box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-top: 3px solid var(--gold);
+  transition: transform 0.15s;
 }
-.history-card h3 {
+.code-card:hover { transform: translateY(-2px); }
+.code-card.occupied { border-top-color: #ef4444; }
+
+.code-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.code-apt-name {
   font-size: 16px;
   font-weight: 700;
   color: var(--navy);
-  margin-bottom: 16px;
+  margin-bottom: 2px;
 }
-.history-list { display: flex; flex-direction: column; gap: 10px; }
-.history-item {
+.code-price { font-size: 12px; color: var(--muted); }
+
+.code-status {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+.code-status.occupe { background: #fee2e2; color: #dc2626; }
+.code-status.libre  { background: #dcfce7; color: #16a34a; }
+
+/* LE CODE — affiché en grand */
+.code-display {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 10px 14px;
+  justify-content: space-between;
+  background: #fffbf0;
+  border: 2px dashed var(--gold);
+  border-radius: 12px;
+  padding: 14px 18px;
+}
+.code-text {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--navy);
+  letter-spacing: 4px;
+  font-family: monospace;
+}
+.btn-copy {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.btn-copy:hover { transform: scale(1.2); }
+
+.code-date {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* LOCATAIRE */
+.code-tenant {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   background: var(--bg);
   border-radius: 10px;
-  font-size: 14px;
+  padding: 10px 14px;
 }
-.history-code { font-weight: 700; color: var(--navy); letter-spacing: 2px; flex: 1; }
-.history-apt  { color: var(--muted); flex: 2; }
-.history-date { color: var(--muted); font-size: 12px; }
+.tenant-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: white;
+  font-size: 13px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.tenant-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--navy);
+  display: block;
+}
+.tenant-email { font-size: 11px; color: var(--muted); }
+
+.code-no-tenant {
+  font-size: 13px;
+  color: var(--muted);
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+/* ACTIONS */
+.code-actions {
+  display: flex;
+  gap: 8px;
+}
+.btn-modify {
+  flex: 1;
+  background: none;
+  border: 1.5px solid var(--navy);
+  color: var(--navy);
+  border-radius: 8px;
+  padding: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.btn-modify:hover { background: var(--navy); color: white; }
+
+.btn-delete-code {
+  background: none;
+  border: 1.5px solid #fecaca;
+  color: #dc2626;
+  border-radius: 8px;
+  padding: 9px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.btn-delete-code:hover { background: #fff0f0; }
+
+/* EMPTY */
+.empty-codes {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--muted);
+}
+.empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-codes p { font-size: 15px; font-weight: 500; }
+
+/* ══ MODAL CONFIRMATION ══ */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100; padding: 20px;
+}
+.modal {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 32px;
+  width: 100%; max-width: 460px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.confirm-modal { text-align: center; }
+.confirm-icon  { font-size: 52px; }
+.confirm-modal h3 {
+  font-size: 20px; font-weight: 700; color: var(--navy);
+}
+.confirm-info p { font-size: 14px; color: var(--muted); line-height: 1.5; }
+.confirm-tenant {
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 12px;
+  margin: 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.confirm-tenant strong { font-size: 15px; color: var(--navy); }
+.confirm-tenant span   { font-size: 12px; color: var(--muted); }
+
+.confirm-warning {
+  background: #fef3c7;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px !important;
+  color: #92400e !important;
+  margin-top: 8px;
+}
+
+.modal-actions { display: flex; gap: 10px; }
+.btn-cancel {
+  flex: 1; padding: 12px; border-radius: 10px;
+  border: 1.5px solid var(--border); background: none;
+  color: var(--text); font-weight: 600; font-size: 14px;
+}
+.btn-confirm-danger {
+  flex: 1; padding: 12px; border-radius: 10px;
+  border: none; background: #ef4444;
+  color: white; font-weight: 700; font-size: 14px;
+  transition: background 0.2s;
+}
+.btn-confirm-danger:hover { background: #dc2626; }

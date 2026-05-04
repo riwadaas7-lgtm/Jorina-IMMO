@@ -15,8 +15,47 @@
 }
 
 .btn-add {
-  @extend .btn, .btn-primary;
+  background: var(--gold);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 22px;
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s;
 }
+.btn-add:hover { background: var(--gold-hover); }
+
+.btn-icon {
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  width: 38px;
+  height: 38px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.btn-iconn2 {
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  width: 59px;
+  height: 38px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.btn-icon.edit:hover { border-color: var(--navy); background: #f0f4ff; }
+.btn-icon.del:hover  { border-color: var(--danger); background: #fff0f0; }
+
 
 /* STATS */
 .stats-row {
@@ -325,3 +364,34 @@
   color: white; font-weight: 700; font-size: 14px;
 }
 .btn-save:hover { background: var(--gold-hover); }
+.btn-renew {
+  background: none;
+  border: 1.5px solid #16a34a;
+  color: #16a34a;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.btn-renew:hover { background: #f0fdf4; }
+.btn-renew:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-terminate {
+  background: none;
+  border: 1.5px solid #dc2626;
+  color: #dc2626;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.btn-terminate:hover { background: #fef2f2; }
+
+.btn-confirm-danger {
+  flex: 1; padding: 12px; border-radius: 10px;
+  border: none; background: #ef4444;
+  color: white; font-weight: 700; font-size: 14px;
+}
+.btn-confirm-danger:hover { background: #dc2626; }

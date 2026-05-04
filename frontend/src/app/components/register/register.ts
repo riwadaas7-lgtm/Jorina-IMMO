@@ -34,14 +34,14 @@ export class RegisterComponent {
     });
   }
 
-  // ✅ Change le rôle sélectionné
+  //  Change le role selectionne
   selectRole(r: string) {
     this.role     = r;
     this.errorMsg = '';
   }
 
   register() {
-    // Vérification des champs obligatoires
+    // Verification des champs obligatoires
     if (!this.nom || !this.prenom || !this.email || !this.password) {
       this.errorMsg = 'Veuillez remplir tous les champs obligatoires.';
       return;
@@ -62,7 +62,7 @@ export class RegisterComponent {
     }).subscribe({
       next: (res: any) => {
         this.auth.login(res);           // sauvegarde token + user
-        this.auth.redirectAfterLogin(); // redirige selon le rôle
+        this.auth.redirectAfterLogin(); // redirige selon le role
       },
       error: (err) => {
         this.errorMsg = err.error?.detail || 'Erreur lors de l\'inscription.';
